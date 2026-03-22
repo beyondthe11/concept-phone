@@ -11,6 +11,10 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #000;
@@ -97,10 +101,10 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8 text-xs font-medium text-gray-300">
-                        <a href="#" class="hover:text-white transition-colors">Overview</a>
-                        <a href="#" class="hover:text-white transition-colors">Design</a>
-                        <a href="#" class="hover:text-white transition-colors">Cameras</a>
-                        <a href="#" class="hover:text-white transition-colors">Specs</a>
+                        <a href="#overview" class="hover:text-white transition-colors">Overview</a>
+                        <a href="#design" class="hover:text-white transition-colors">Design</a>
+                        <a href="#cameras" class="hover:text-white transition-colors">Cameras</a>
+                        <a href="#specs" class="hover:text-white transition-colors">Specs</a>
                     </div>
                 </div>
                 <div>
@@ -221,6 +225,133 @@
 
         </div>
     </main>
+
+    <!-- Overview Section -->
+    <section id="overview" class="relative bg-black py-32 border-t border-white/10 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-16 text-center text-white">The core of innovation.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-hero bg-clip-text text-xl font-bold mb-4">A18 Pro Chip</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">Mind-blowing speed.</h3>
+                    <p class="text-gray-400 leading-relaxed">Next-generation performance and efficiency. Featuring a 6-core GPU for console-level gaming right in your pocket.</p>
+                </div>
+                <div class="bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-titanium bg-clip-text text-xl font-bold mb-4">Titanium Build</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">Light. Strong. Pro.</h3>
+                    <p class="text-gray-400 leading-relaxed">Aerospace-grade titanium makes Aura Pro incredibly durable yet remarkably lightweight in the hand.</p>
+                </div>
+                <div class="bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-screen-1 bg-clip-text text-xl font-bold mb-4">Battery Life</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">All-day power.</h3>
+                    <p class="text-gray-400 leading-relaxed">Up to 29 hours of video playback. Advanced power management means your device lasts as long as you do.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Design Section -->
+    <section id="design" class="relative bg-zinc-950 py-32 border-t border-white/10 z-40 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-16">
+            <div class="flex-1 z-10">
+                <h2 class="text-5xl md:text-7xl font-bold tracking-tighter mb-8 text-white">Forged in <br><span class="text-transparent bg-gradient-titanium bg-clip-text">Titanium</span>.</h2>
+                <p class="text-xl text-gray-400 mb-6 leading-relaxed">Aura Pro features a stunning aerospace-grade titanium design, using the same alloy that spacecraft use for missions to Mars.</p>
+                <p class="text-xl text-gray-400 leading-relaxed">It has one of the highest strength-to-weight ratios of any metal, making these our lightest Pro models ever. You'll notice the difference the moment you pick one up.</p>
+            </div>
+            <div class="flex-1 flex justify-center relative">
+                <!-- Abstract Titanium representation -->
+                <div class="w-72 h-72 md:w-96 md:h-96 rounded-full bg-gradient-titanium opacity-40 blur-[80px] absolute mix-blend-screen animate-pulse"></div>
+                <div class="w-64 h-64 md:w-80 md:h-80 border border-gray-500/30 rounded-full flex items-center justify-center backdrop-blur-3xl z-10 bg-gradient-to-br from-white/10 to-transparent">
+                    <div class="w-48 h-48 border border-gray-400/20 rounded-full flex items-center justify-center">
+                         <div class="w-32 h-32 border border-gray-300/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cameras Section -->
+    <section id="cameras" class="relative bg-black py-32 border-t border-white/10 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl md:text-6xl font-bold tracking-tighter mb-6 text-white">A lens for every moment.</h2>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-20">Capture breathtaking details with the advanced 48MP Main camera. Get closer than ever with the 5x Telephoto lens. See the bigger picture with the Ultra Wide.</p>
+            
+            <div class="flex flex-col md:flex-row justify-center items-end gap-12 md:gap-24 mb-12">
+                <!-- Main Lens -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-32 h-32 rounded-full border-[6px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-20 h-20 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_20px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-2 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">48MP Main</span>
+                    <span class="text-gray-500 text-sm">24mm, ƒ/1.78 aperture</span>
+                </div>
+                <!-- Ultra Wide Lens -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-24 h-24 rounded-full border-[5px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-14 h-14 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_15px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-1 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">12MP Ultra Wide</span>
+                    <span class="text-gray-500 text-sm">13mm, 120° field of view</span>
+                </div>
+                <!-- Telephoto Lens -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-24 h-24 rounded-full border-[5px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-14 h-14 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_15px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-3 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">12MP 5x Telephoto</span>
+                    <span class="text-gray-500 text-sm">120mm, ƒ/2.8 aperture</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specs Section -->
+    <section id="specs" class="relative bg-zinc-950 py-32 border-t border-white/10 z-40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-16 text-center text-white">Technical Specifications</h2>
+            
+            <div class="bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+                <div class="flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Display</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">6.7" Super Retina XDR OLED</strong>
+                        ProMotion technology with adaptive refresh rates up to 120Hz. HDR display, True Tone, Wide color (P3).
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Processor</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">A18 Pro Bionic chip</strong>
+                        New 6‑core CPU with 2 performance and 4 efficiency cores. New 6‑core GPU. New 16‑core Neural Engine.
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Camera</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Pro camera system</strong>
+                        48MP Main, 12MP Ultra Wide, and 12MP 5x Telephoto. Next-generation portraits with Focus and Depth Control.
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Battery</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Up to 29 hours video playback</strong>
+                        Built-in rechargeable lithium-ion battery. MagSafe and Qi2 wireless charging. Fast-charge capable.
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Materials</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Aerospace-grade Titanium</strong>
+                        Textured matte glass back. Ceramic Shield front, tougher than any smartphone glass. IP68 water resistance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Outro / Buy Section -->
     <section class="relative bg-black py-32 border-t border-white/10 z-50">
