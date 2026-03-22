@@ -22,11 +22,9 @@
             overflow-x: hidden;
         }
 
-        /* Hide default cursor on desktop */
-        @media (pointer: fine) {
-            body, a, button {
-                cursor: none !important;
-            }
+        /* Dynamically applied class to hide native cursor once mouse is detected */
+        .cursor-none-global, .cursor-none-global * {
+            cursor: none !important;
         }
 
         /* Hide scrollbar for cleaner look */
@@ -83,7 +81,8 @@
         }
         .animate-marquee {
             display: flex;
-            width: max-content;
+            white-space: nowrap;
+            width: fit-content;
             animation: marquee 25s linear infinite;
         }
 
@@ -110,14 +109,14 @@
 </head>
 <body class="selection:bg-white selection:text-black">
 
-    <!-- Custom Cursor Elements -->
-    <div id="cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference hidden md:block origin-center transform -translate-x-1/2 -translate-y-1/2"></div>
-    <div id="cursor-outline" class="fixed top-0 left-0 w-10 h-10 border border-white/50 rounded-full pointer-events-none z-[100] mix-blend-difference hidden md:block origin-center transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ease-out"></div>
+    <!-- Custom Cursor Elements (Hidden until mouse moves) -->
+    <div id="cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference opacity-0 -ml-1 -mt-1"></div>
+    <div id="cursor-outline" class="fixed top-0 left-0 w-10 h-10 border border-white/50 rounded-full pointer-events-none z-[9999] mix-blend-difference opacity-0 -ml-5 -mt-5 transition-[transform,background-color] duration-300 ease-out"></div>
 
     <!-- Header (Marquee + Navigation) -->
-    <header class="fixed top-0 w-full z-50 transition-all duration-300">
+    <header class="fixed top-0 w-full z-[100] transition-all duration-300">
         <!-- Marquee Bar -->
-        <div class="w-full bg-zinc-900 text-gray-300 border-b border-white/10 overflow-hidden py-1.5 flex text-[10px] sm:text-xs font-medium tracking-widest uppercase">
+        <div class="w-full bg-zinc-900 text-gray-300 border-b border-white/10 overflow-hidden py-1.5 flex text-[10px] sm:text-xs font-semibold tracking-widest uppercase relative z-[101]">
             <div class="animate-marquee items-center">
                 <!-- Group 1 -->
                 <span class="mx-8">Pre-order begins Friday at 5:00 a.m. PDT.</span> •
@@ -131,7 +130,7 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="w-full bg-black/50 backdrop-blur-md border-b border-white/10">
+        <nav class="w-full bg-black/50 backdrop-blur-md border-b border-white/10 relative z-[100]">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-14">
                     <div class="flex-shrink-0 font-semibold text-lg tracking-tight">
@@ -432,36 +431,40 @@
             // --- CUSTOM CURSOR LOGIC ---
             const cursorDot = document.getElementById('cursor-dot');
             const cursorOutline = document.getElementById('cursor-outline');
+            let cursorInitialized = false;
             
-            // Only execute cursor logic on non-touch devices
-            if (window.matchMedia("(pointer: fine)").matches) {
-                // GSAP quickTo is optimized for mouse tracking
-                let xToDot = gsap.quickTo(cursorDot, "left", {duration: 0.1, ease: "power3"});
-                let yToDot = gsap.quickTo(cursorDot, "top", {duration: 0.1, ease: "power3"});
-                
-                let xToOutline = gsap.quickTo(cursorOutline, "left", {duration: 0.5, ease: "power3"});
-                let yToOutline = gsap.quickTo(cursorOutline, "top", {duration: 0.5, ease: "power3"});
+            // GSAP quickTo is optimized for mouse tracking (use x/y instead of left/top for performance)
+            let xToDot = gsap.quickTo(cursorDot, "x", {duration: 0.05, ease: "power3"});
+            let yToDot = gsap.quickTo(cursorDot, "y", {duration: 0.05, ease: "power3"});
+            
+            let xToOutline = gsap.quickTo(cursorOutline, "x", {duration: 0.3, ease: "power3"});
+            let yToOutline = gsap.quickTo(cursorOutline, "y", {duration: 0.3, ease: "power3"});
 
-                window.addEventListener("mousemove", (e) => {
-                    xToDot(e.clientX);
-                    yToDot(e.clientY);
-                    xToOutline(e.clientX);
-                    yToOutline(e.clientY);
-                });
+            window.addEventListener("mousemove", (e) => {
+                // Initialize custom cursor on first mouse movement
+                if (!cursorInitialized) {
+                    document.body.classList.add('cursor-none-global');
+                    gsap.to([cursorDot, cursorOutline], {opacity: 1, duration: 0.3});
+                    cursorInitialized = true;
+                }
+                xToDot(e.clientX);
+                yToDot(e.clientY);
+                xToOutline(e.clientX);
+                yToOutline(e.clientY);
+            });
 
-                // Add hover states to interactive elements
-                const interactables = document.querySelectorAll('a, button');
-                interactables.forEach(el => {
-                    el.addEventListener('mouseenter', () => {
-                        cursorOutline.classList.add('scale-[1.5]', 'bg-white/10');
-                        cursorDot.classList.add('opacity-0');
-                    });
-                    el.addEventListener('mouseleave', () => {
-                        cursorOutline.classList.remove('scale-[1.5]', 'bg-white/10');
-                        cursorDot.classList.remove('opacity-0');
-                    });
+            // Add hover states to interactive elements
+            const interactables = document.querySelectorAll('a, button');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorOutline.classList.add('scale-[1.5]', 'bg-white/10');
+                    cursorDot.style.opacity = '0';
                 });
-            }
+                el.addEventListener('mouseleave', () => {
+                    cursorOutline.classList.remove('scale-[1.5]', 'bg-white/10');
+                    cursorDot.style.opacity = '1';
+                });
+            });
 
             // --- HERO MAIN ANIMATION SEQUENCE ---
             // Create a main timeline tied to the scroll container
@@ -603,4 +606,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
