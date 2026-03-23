@@ -56,6 +56,11 @@
               -webkit-font-smoothing: antialiased;
             }
 
+            body.loading-locked {
+              overflow: hidden;
+              height: 100vh;
+            }
+
             .font-serif-elegant {
               font-family: 'Playfair Display', serif;
             }
@@ -157,6 +162,23 @@
               100% { transform: translate(2px, 2px); }
             }
 
+            /* --- Loader --- */
+            .loader-overlay {
+              position: fixed;
+              inset: 0;
+              background: var(--bg);
+              z-index: 9999;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 1s;
+            }
+            .loader-overlay.fade-out {
+              opacity: 0;
+              visibility: hidden;
+            }
+
             /* --- Minimal Scrollbar --- */
             ::-webkit-scrollbar { width: 8px; }
             ::-webkit-scrollbar-track { background: var(--bg); border-left: 2px solid var(--border); }
@@ -197,6 +219,18 @@
         };
 
         // --- Components ---
+
+        const Loader = ({ isFading }) => (
+          <div className={`loader-overlay ${isFading ? 'fade-out' : ''}`}>
+            <h1 className="font-malayalam text-black text-7xl md:text-9xl font-black mb-6 hover-jitter cursor-crosshair">കാപ്പി</h1>
+            <div className="flex items-center gap-4">
+              <Asterisk size={32} className="text-black animate-spin-slow" />
+              <span className="font-mono text-sm md:text-base uppercase tracking-[0.2em] font-bold text-black animate-pulse">
+                Extracting
+              </span>
+            </div>
+          </div>
+        );
 
         const Marquee = ({ text, bg = "bg-black", color = "text-[#FF1E00]", border = "border-y border-black", size = "text-xl md:text-2xl" }) => (
           <div className={`w-full overflow-hidden ${bg} ${color} ${border} py-2 flex relative z-10 font-bold uppercase tracking-widest`}>
@@ -492,9 +526,33 @@
         );
 
         function App() {
+          const [isLoading, setIsLoading] = useState(true);
+          const [isFading, setIsFading] = useState(false);
+
+          useEffect(() => {
+            // Lock body scrolling while loading
+            document.body.classList.add('loading-locked');
+
+            const fadeTimer = setTimeout(() => {
+              setIsFading(true);
+            }, 1800); // Wait 1.8 seconds before triggering fade
+
+            const removeTimer = setTimeout(() => {
+              setIsLoading(false);
+              document.body.classList.remove('loading-locked');
+            }, 2800); // 1.8s wait + 1s fade animation duration
+
+            return () => {
+              clearTimeout(fadeTimer);
+              clearTimeout(removeTimer);
+              document.body.classList.remove('loading-locked');
+            };
+          }, []);
+
           return (
             <>
               <CustomStyles />
+              {isLoading && <Loader isFading={isFading} />}
               <div className="flex flex-col min-h-screen">
                 <Header />
                 <main className="w-full flex flex-col border-grid">
