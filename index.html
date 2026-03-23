@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kāppi Coffee | High Voltage</title>
+    <title>Kāppi Coffee | Acid Editorial</title>
     
     <!-- React & ReactDOM via CDN -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (Translates React code for the browser) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Tailwind CSS -->
@@ -21,88 +21,57 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Inline SVG Icons (Replacing lucide-react for standalone HTML) ---
-        const Zap = ({ size, className, fill }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        );
-        const ShoppingBag = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        // --- Minimalist SVG Icons ---
+        const ArrowRight = ({ size, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         );
         const Asterisk = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 6v12"/><path d="M17.196 9 6.804 15"/><path d="m6.804 9 10.392 6"/></svg>
-        );
-        const Crosshair = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
-        );
-        const Skull = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>
-        );
-        const Droplets = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7 2.9 7 2.9s-1.14 3.96-2.29 4.86C3.57 8.7 3 9.8 3 10.96c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 1 14 8c2.53 2.53 2.53 6.59 0 9.13a6.5 6.5 0 0 1-9.13 0L3 16"/></svg>
-        );
-        const ArrowRight = ({ size, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 6v12"/><path d="M17.196 9 6.804 15"/><path d="m6.804 9 10.392 6"/></svg>
         );
 
         // --- Global Styles & Keyframes ---
         const CustomStyles = () => (
           <style dangerouslySetInnerHTML={{__html: `
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Malayalam:wght@900&family=Space+Grotesk:wght@400;700;900&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,900;1,400;1,900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Noto+Serif+Malayalam:wght@300;400;700;900&display=swap');
 
             :root {
-              --bg: #09090b;       /* Deep Space Black */
-              --fg: #fafafa;       /* Off White */
-              --acid: #ccff00;     /* Acid Green */
-              --pink: #ff00ff;     /* Hyper Pink */
-              --purple: #7000ff;   /* Digital Purple */
+              --bg: #0b001a;         /* Deep Space Purple */
+              --fg: #f0f0f0;         /* Stark White */
+              --c1: #00f3ff;         /* Neon Cyan */
+              --c2: #ff0055;         /* Hot Pink */
+              --c3: #ccff00;         /* Acid Yellow */
+              --border: var(--c1);   /* Cyan Borders */
+            }
+
+            html {
+              scroll-behavior: smooth;
             }
 
             body {
               background-color: var(--bg);
               color: var(--fg);
-              font-family: 'Space Grotesk', sans-serif;
+              font-family: 'Space Mono', monospace;
               overflow-x: hidden;
               margin: 0;
               -webkit-font-smoothing: antialiased;
             }
 
-            body.loading-locked {
-              overflow: hidden;
-              height: 100vh;
+            .font-serif-elegant {
+              font-family: 'Playfair Display', serif;
             }
-
             .font-malayalam {
               font-family: 'Noto Serif Malayalam', serif;
             }
 
-            /* --- Neo-Brutalist Utilities --- */
-            .brutal-border {
-              border: 3px solid var(--fg);
-            }
-            
-            .brutal-shadow {
-              box-shadow: 6px 6px 0px var(--acid);
-              transition: all 0.2s ease;
-            }
-            
-            .brutal-shadow:hover {
-              box-shadow: 2px 2px 0px var(--acid);
-              transform: translate(4px, 4px);
+            /* Editorial Borders with Neon Color */
+            .border-grid {
+              border-color: var(--border);
             }
 
-            .brutal-shadow-pink {
-              box-shadow: 6px 6px 0px var(--pink);
-              transition: all 0.2s ease;
-            }
-
-            .brutal-shadow-pink:hover {
-              box-shadow: 2px 2px 0px var(--pink);
-              transform: translate(4px, 4px);
-            }
-
-            .brutal-grid {
-              background-image: radial-gradient(rgba(250,250,250,0.15) 2px, transparent 2px);
-              background-size: 30px 30px;
+            /* Custom Selection */
+            ::selection {
+              background: var(--c3);
+              color: #000;
             }
 
             /* --- Animations --- */
@@ -114,107 +83,83 @@
             .animate-marquee {
               display: inline-block;
               white-space: nowrap;
-              animation: marquee 15s linear infinite;
+              animation: marquee 12s linear infinite;
             }
 
             @keyframes spin-slow {
               100% { transform: rotate(360deg); }
             }
-
             .animate-spin-slow {
-              animation: spin-slow 8s linear infinite;
+              animation: spin-slow 10s linear infinite;
             }
 
-            @keyframes pulse-acid {
-              0%, 100% { filter: drop-shadow(0 0 15px rgba(204, 255, 0, 0.2)); }
-              50% { filter: drop-shadow(0 0 30px rgba(204, 255, 0, 0.8)); }
+            @keyframes float {
+              0%, 100% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-20px) rotate(5deg); }
+            }
+            .animate-float {
+              animation: float 4s ease-in-out infinite;
             }
 
-            .acid-glow {
-              animation: pulse-acid 2s infinite;
-            }
-
-            @keyframes glitch {
-              0% { transform: translate(0) }
-              20% { transform: translate(-2px, 2px) }
-              40% { transform: translate(-2px, -2px) }
-              60% { transform: translate(2px, 2px) }
-              80% { transform: translate(2px, -2px) }
-              100% { transform: translate(0) }
-            }
-
-            .glitch-hover:hover {
-              animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
-              color: var(--acid);
-            }
-
-            /* --- Loader Cup Animations --- */
-            .loader-overlay {
-              position: fixed;
-              inset: 0;
-              background: var(--pink);
-              z-index: 1000;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-            }
-
-            .loader-overlay.slide-up {
-              transform: translateY(-100%);
-            }
-
-            .cup-fill {
-              animation: fillUp 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            }
-
-            @keyframes fillUp {
-              0% { height: 0%; }
-              100% { height: 95%; }
-            }
-
-            .steam-block {
-              animation: rise 1.5s infinite linear;
-            }
-
-            .steam-block:nth-child(2) { animation-delay: 0.5s; }
-            .steam-block:nth-child(3) { animation-delay: 1s; }
-
-            @keyframes rise {
-              0% { transform: translateY(0) scale(1); opacity: 0; }
-              20% { opacity: 1; }
-              80% { opacity: 1; }
-              100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
-            }
-
-            /* --- Scroll Reveals --- */
-            .reveal-up {
+            .fade-in-up {
               opacity: 0;
-              transform: translateY(60px);
-              transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+              transform: translateY(40px) scale(0.95);
+              transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
-            
-            .reveal-up.is-visible {
+            .fade-in-up.is-visible {
               opacity: 1;
-              transform: translateY(0);
+              transform: translateY(0) scale(1);
             }
 
-            .reveal-scale {
+            .slide-in-right {
               opacity: 0;
-              transform: scale(0.8);
-              transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+              transform: translateX(100px);
+              transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
-
-            .reveal-scale.is-visible {
+            .slide-in-right.is-visible {
               opacity: 1;
-              transform: scale(1);
+              transform: translateX(0);
             }
 
-            /* --- Custom Scrollbar --- */
-            ::-webkit-scrollbar { width: 12px; }
-            ::-webkit-scrollbar-track { background: var(--bg); border-left: 2px solid var(--fg); }
-            ::-webkit-scrollbar-thumb { background: var(--acid); border: 2px solid var(--bg); }
+            /* Aggressive Hover States */
+            .hover-invert-pink {
+              transition: all 0.3s ease;
+            }
+            .hover-invert-pink:hover {
+              background-color: var(--c2);
+              color: #fff;
+              border-color: var(--c2);
+              transform: scale(1.02);
+              box-shadow: 8px 8px 0px var(--c1);
+            }
+
+            .hover-invert-cyan {
+              transition: all 0.3s ease;
+            }
+            .hover-invert-cyan:hover {
+              background-color: var(--c1);
+              color: #000;
+              border-color: var(--c1);
+              transform: translateX(-10px);
+              box-shadow: -8px 8px 0px var(--c3);
+            }
+
+            .hover-jitter:hover {
+              animation: jitter 0.2s infinite;
+            }
+            @keyframes jitter {
+              0% { transform: translate(0, 0); }
+              25% { transform: translate(2px, -2px); }
+              50% { transform: translate(-2px, 2px); }
+              75% { transform: translate(-2px, -2px); }
+              100% { transform: translate(2px, 2px); }
+            }
+
+            /* --- Minimal Scrollbar --- */
+            ::-webkit-scrollbar { width: 8px; }
+            ::-webkit-scrollbar-track { background: var(--bg); border-left: 1px solid var(--border); }
+            ::-webkit-scrollbar-thumb { background: var(--c2); }
+            ::-webkit-scrollbar-thumb:hover { background: var(--c3); }
           `}} />
         );
 
@@ -250,92 +195,83 @@
         };
 
         // --- Components ---
-        const BrutalistLoader = ({ isFading }) => (
-          <div className={`loader-overlay ${isFading ? 'slide-up' : ''} brutal-grid`}>
-            <div className="flex gap-4 mb-4">
-              <div className="w-4 h-4 bg-black steam-block"></div>
-              <div className="w-6 h-6 bg-black steam-block"></div>
-              <div className="w-4 h-4 bg-black steam-block"></div>
-            </div>
-            
-            <div className="flex items-end mb-8 relative z-10 transform scale-125">
-              <div className="w-32 h-40 border-[8px] border-black bg-white relative overflow-hidden shadow-[8px_8px_0px_#ccff00]">
-                <div className="absolute bottom-0 left-0 right-0 bg-[#09090b] cup-fill">
-                   <div className="absolute top-2 left-2 w-4 h-12 bg-white/20"></div>
-                </div>
-                <div className="absolute top-3 left-3 right-3 bottom-3 border-4 border-black/10 pointer-events-none z-10"></div>
-              </div>
-              <div className="w-12 h-20 border-[8px] border-black border-l-0 mb-6 shadow-[8px_8px_0px_#ccff00] relative -left-2 z-0"></div>
-            </div>
-            
-            <h1 className="font-malayalam text-black text-6xl font-black mb-2 animate-pulse">കാപ്പി</h1>
-            <div className="font-black text-xl uppercase tracking-widest text-black bg-white px-4 py-1 border-4 border-black transform -rotate-2">
-              Brewing Protocol...
-            </div>
-          </div>
-        );
 
-        const Marquee = ({ text, bg = "bg-[#ccff00]", color = "text-black", border = "border-y-4 border-black" }) => (
-          <div className={`w-full overflow-hidden ${bg} ${color} ${border} py-3 flex relative z-10 font-black text-2xl md:text-4xl uppercase tracking-tighter`}>
-            <div className="animate-marquee whitespace-nowrap">
-              <span className="mx-4">{text}</span><span className="mx-4">///</span>
-              <span className="mx-4">{text}</span><span className="mx-4">///</span>
-              <span className="mx-4">{text}</span><span className="mx-4">///</span>
-              <span className="mx-4">{text}</span><span className="mx-4">///</span>
-              <span className="mx-4">{text}</span><span className="mx-4">///</span>
+        const Marquee = ({ text, bg = "bg-[#00f3ff]", color = "text-black", border = "border-y border-[#00f3ff]", size = "text-2xl" }) => (
+          <div className={`w-full overflow-hidden ${bg} ${color} ${border} py-2 flex relative z-10 font-bold uppercase tracking-widest`}>
+            <div className={`animate-marquee whitespace-nowrap ${size}`}>
+              <span className="mx-4">{text}</span><span className="mx-4">✺</span>
+              <span className="mx-4">{text}</span><span className="mx-4">✺</span>
+              <span className="mx-4">{text}</span><span className="mx-4">✺</span>
+              <span className="mx-4">{text}</span><span className="mx-4">✺</span>
+              <span className="mx-4">{text}</span><span className="mx-4">✺</span>
               <span className="mx-4">{text}</span>
             </div>
           </div>
         );
 
-        const Header = () => (
-          <header className="fixed top-0 left-0 right-0 z-50 bg-[#09090b] border-b-4 border-[#fafafa]">
-            <div className="w-full flex justify-between items-stretch">
-              <div className="flex items-center gap-3 px-6 py-4 border-r-4 border-[#fafafa] bg-[#ccff00] text-black">
-                <Zap size={24} className="animate-pulse" fill="currentColor" />
-                <span className="font-malayalam text-2xl font-black tracking-widest leading-none mt-1">കാപ്പി</span>
-              </div>
+        const Sidebar = () => (
+          <aside className="w-full md:w-1/4 border-b md:border-b-0 md:border-r border-grid p-6 md:p-10 sticky top-0 h-auto md:h-screen flex flex-col justify-between z-50 bg-[#0b001a]/90 backdrop-blur-md">
+            <div>
+              <h1 className="font-malayalam text-[#ccff00] text-4xl md:text-6xl mb-2 leading-none hover-jitter cursor-crosshair">കാപ്പി</h1>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#00f3ff] mb-12 animate-pulse">Coffee Roasters</p>
               
-              <nav className="flex items-stretch text-sm md:text-base font-bold uppercase tracking-widest">
-                <a href="#process" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#ff00ff] hover:text-black transition-colors">Protocol</a>
-                <a href="#manifesto" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#7000ff] hover:text-white transition-colors">Manifesto</a>
-                <a href="#menu" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] hover:bg-[#ccff00] hover:text-black transition-colors">Menu</a>
-                <a href="#merch" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] bg-[#fafafa] text-black hover:bg-[#ccff00] transition-colors gap-2">
-                  <span>Merch</span>
-                  <ShoppingBag size={18} />
+              <nav className="flex flex-col gap-6 text-sm uppercase tracking-widest font-bold">
+                <a href="#home" className="hover:text-[#ff0055] transition-colors w-fit flex items-center gap-2 group">
+                  <span className="text-[#00f3ff] opacity-0 group-hover:opacity-100 transition-opacity">→</span> 01. Home
+                </a>
+                <a href="#protocol" className="hover:text-[#ff0055] transition-colors w-fit flex items-center gap-2 group">
+                  <span className="text-[#00f3ff] opacity-0 group-hover:opacity-100 transition-opacity">→</span> 02. Protocol
+                </a>
+                <a href="#philosophy" className="hover:text-[#ff0055] transition-colors w-fit flex items-center gap-2 group">
+                  <span className="text-[#00f3ff] opacity-0 group-hover:opacity-100 transition-opacity">→</span> 03. Philosophy
+                </a>
+                <a href="#menu" className="hover:text-[#ff0055] transition-colors w-fit flex items-center gap-2 group">
+                  <span className="text-[#00f3ff] opacity-0 group-hover:opacity-100 transition-opacity">→</span> 04. The Menu
+                </a>
+                <a href="#merch" className="hover:text-[#ff0055] transition-colors w-fit flex items-center gap-2 group">
+                  <span className="text-[#00f3ff] opacity-0 group-hover:opacity-100 transition-opacity">→</span> 05. Hardware
                 </a>
               </nav>
             </div>
-          </header>
-        );
 
-        const HeroSection = () => (
-          <section className="relative min-h-screen pt-24 flex flex-col justify-between overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_#1a1a1a_0%,_#09090b_100%)]">
-            <div className="absolute top-1/4 left-10 text-[#ccff00] opacity-20 animate-spin-slow">
-              <Asterisk size={200} />
-            </div>
-            <div className="absolute bottom-1/4 right-10 text-[#ff00ff] opacity-20 animate-spin-slow" style={{ animationDirection: 'reverse' }}>
-              <Crosshair size={180} />
-            </div>
-
-            <div className="flex-1 flex flex-col items-center justify-center px-4 text-center z-10 relative">
-              <div className="inline-block bg-[#ff00ff] text-black font-black uppercase tracking-widest px-4 py-2 mb-6 border-2 border-white transform -rotate-3 hover:rotate-0 transition-transform cursor-crosshair">
-                Version 2.0 // High Voltage
-              </div>
-              
-              <h1 className="font-malayalam font-black text-[#fafafa] mb-2 leading-none acid-glow glitch-hover"
-                  style={{ fontSize: 'clamp(5rem, 20vw, 15rem)', textShadow: '8px 8px 0px #ccff00' }}>
-                കാപ്പി
-              </h1>
-              
-              <p className="text-[#fafafa] font-black uppercase text-2xl md:text-5xl tracking-tighter max-w-4xl mx-auto leading-none mt-4">
-                Not your parents' <br className="md:hidden" /> boring morning drip.
+            <div className="hidden md:block mt-12">
+              <Asterisk size={40} className="text-[#ff0055] animate-spin-slow mb-4" />
+              <p className="text-[10px] uppercase tracking-widest text-[#00f3ff] leading-relaxed">
+                Extracting the essence<br/>
+                Destroying morning routines<br/>
+                Est. 2026
               </p>
             </div>
-            <Marquee text="LIQUID ADRENALINE" />
-          </section>
+          </aside>
         );
 
+        const HeroSection = () => {
+          return (
+            <section id="home" className="relative min-h-[70vh] md:min-h-screen flex flex-col justify-between border-b border-grid bg-[radial-gradient(ellipse_at_bottom_right,_#ff005520_0%,_transparent_50%)] overflow-hidden">
+              
+              <div className="absolute top-10 right-10 text-[#ccff00] animate-spin-slow opacity-50">
+                <Asterisk size={120} strokeWidth={1} />
+              </div>
+
+              <div className="p-6 md:p-16 flex-1 flex flex-col justify-end z-10">
+                <div className="max-w-4xl animate-float">
+                  <h2 className="font-serif-elegant text-6xl md:text-8xl lg:text-9xl font-black leading-[0.8] text-white mb-8 fade-in-up">
+                    Viscous.<br/>
+                    <span className="italic text-[#00f3ff]">Sensory.</span><br/>
+                    <span className="text-[#ff0055] hover-jitter inline-block">Coffee.</span>
+                  </h2>
+                  <p className="text-sm md:text-base uppercase tracking-widest text-[#ccff00] max-w-lg leading-relaxed fade-in-up bg-black/50 p-4 border border-[#ccff00]" style={{transitionDelay: '0.2s'}}>
+                    We treat coffee as a medium. No syrups. No distractions. Just meticulously extracted single origins that command your attention.
+                  </p>
+                </div>
+              </div>
+
+              <Marquee text="LIQUID ADRENALINE" bg="bg-[#ff0055]" color="text-white" border="border-t border-[#00f3ff]" />
+            </section>
+          );
+        };
+
+        // --- Scrollytelling Section ---
         const ScrollytellingProtocol = () => {
           const scrollY = useScroll();
           const sectionRef = useRef(null);
@@ -357,95 +293,102 @@
             progress = Math.min(1, relativeScroll / scrollableDistance);
           }
 
-          let phase = "CRUSH";
-          let bg = "bg-[#09090b]";
-          let color = "text-[#ccff00]";
+          // State Logic
+          let phase = "01. CRUSH";
+          let bg = "bg-[#0b001a]";
+          let color = "text-[#00f3ff]";
+          let shadow = "0px 0px 40px #00f3ff";
           
           if (progress > 0.33) {
-            phase = "BOIL";
-            bg = "bg-[#ff00ff]";
-            color = "text-black";
+            phase = "02. BLOOM";
+            bg = "bg-[#ff0055]";
+            color = "text-white";
+            shadow = "0px 0px 60px #0b001a";
           }
           if (progress > 0.66) {
-            phase = "EXTRACT";
+            phase = "03. EXTRACT";
             bg = "bg-[#ccff00]";
             color = "text-black";
+            shadow = "none";
           }
 
           const subProgress = (progress % 0.33) * 3;
-          const textScale = 1 + (subProgress * 1.5);
-          const textOpacity = 1 - (subProgress * 0.4);
+          const textScale = 0.8 + (subProgress * 0.7);
 
           return (
-            <section id="process" ref={sectionRef} className="h-[300vh] relative border-y-4 border-white">
-              <div className={`sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden transition-colors duration-700 brutal-grid ${bg}`}>
+            <section id="protocol" ref={sectionRef} className="h-[300vh] border-b border-grid relative z-20">
+              <div className={`sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden transition-colors duration-500 ${bg}`}>
+                
+                {/* Rotating background element */}
                 <div 
-                  className="absolute opacity-30 text-current"
-                  style={{ transform: `translate(-30vw, ${-50 + (progress * 100)}vh) rotate(${progress * 360}deg)` }}
+                  className="absolute opacity-20 text-current pointer-events-none"
+                  style={{ transform: `rotate(${progress * 360}deg) scale(${1 + progress})` }}
                 >
-                  <Skull size={150} />
-                </div>
-                <div 
-                  className="absolute opacity-30 text-current"
-                  style={{ transform: `translate(30vw, ${100 - (progress * 150)}vh) rotate(${-progress * 180}deg)` }}
-                >
-                  <Droplets size={200} />
+                  <Asterisk size={600} strokeWidth={0.5} />
                 </div>
 
                 <h2 
-                  className={`font-black uppercase tracking-tighter leading-none select-none z-10 text-center ${color}`}
+                  className={`font-serif-elegant font-black uppercase z-10 text-center ${color}`}
                   style={{ 
-                    fontSize: '15vw',
+                    fontSize: 'clamp(4rem, 15vw, 12rem)',
                     transform: `scale(${textScale})`,
-                    opacity: textOpacity,
-                    textShadow: phase === "BOIL" ? '8px 8px 0px white' : '8px 8px 0px black'
+                    textShadow: shadow
                   }}
                 >
                   {phase}
                 </h2>
-
-                <div className="absolute bottom-20 px-6 py-2 border-4 z-10 font-black uppercase text-2xl tracking-widest bg-black text-white">
-                  Protocol {progress > 0.66 ? '03' : progress > 0.33 ? '02' : '01'}
+                
+                {/* Progress bar */}
+                <div className="absolute bottom-10 left-10 right-10 h-2 bg-black/20 overflow-hidden border border-current">
+                   <div className="h-full bg-current" style={{ width: `${progress * 100}%` }}></div>
                 </div>
+
               </div>
             </section>
           );
         };
 
-        const ManifestoSection = () => {
+        const PhilosophySection = () => {
           const [refs, setRefs] = useState([]);
-          const observe = useIntersectionObserver({ threshold: 0.2 });
+          const observe = useIntersectionObserver({ threshold: 0.1 });
 
           useEffect(() => observe(refs), [refs, observe]);
 
+          const rules = [
+            { num: "I", title: "Death to Decaf", text: "We roast beans that demand attention. Maximum flavor, uncompromising extraction, zero apologies." },
+            { num: "II", title: "Locally Disruptive", text: "Sourced from the wildest high-altitude estates. Every batch pushes the absolute limits of the Maillard reaction." },
+            { num: "III", title: "Unadulterated", text: "No caramel-pumpkin-vanilla distractions. We respect the terroir. If you need sugar to hide the taste, you're drinking the wrong coffee." }
+          ];
+
           return (
-            <section id="manifesto" className="py-24 md:py-40 bg-[#fafafa] text-black relative">
-              <div className="max-w-6xl mx-auto px-6">
-                <div className="grid md:grid-cols-12 gap-8 items-start">
-                  <div className="md:col-span-4 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-                     <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
-                       The <br/><span className="text-[#ff00ff]">Rule</span><br/>Book
-                     </h2>
-                     <div className="w-full h-4 bg-[#ccff00] brutal-border border-black"></div>
-                  </div>
-                  
-                  <div className="md:col-span-8 flex flex-col gap-12">
-                    {[
-                      { num: "01", title: "DEATH TO DECAF", text: "We roast beans that punch you in the face. If you want colored water, go somewhere else. We extract maximum flavor, maximum caffeine, zero apologies." },
-                      { num: "02", title: "LOCALLY DISRUPTIVE", text: "Sourced from the wildest estates. Roasted in a garage. Served with attitude. Every batch is an experiment in pushing the limits of the Maillard reaction." },
-                      { num: "03", title: "NO SYRUPS. JUST BEANS.", text: "Don't ask for a caramel-pumpkin-vanilla-swirl. We respect the bean. We respect the roast. If you need sugar to hide the taste, you're drinking bad coffee." }
-                    ].map((rule, idx) => (
-                      <div key={idx} className="group reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-                        <div className="flex gap-4 items-start border-t-4 border-black pt-6">
-                          <span className="text-4xl md:text-6xl font-black text-transparent" style={{ WebkitTextStroke: '2px black' }}>{rule.num}</span>
-                          <div>
-                            <h3 className="text-2xl md:text-4xl font-black uppercase mb-4 group-hover:text-[#ff00ff] transition-colors">{rule.title}</h3>
-                            <p className="text-lg md:text-xl font-bold leading-snug">{rule.text}</p>
-                          </div>
+            <section id="philosophy" className="border-b border-grid bg-[#0b001a]">
+              <Marquee text="THE MANIFESTO" bg="bg-[#ccff00]" color="text-black" border="border-b border-grid" size="text-xl" />
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                <div className="p-6 md:p-16 border-b lg:border-b-0 lg:border-r border-grid flex items-center justify-center bg-[radial-gradient(circle_at_center,_#00f3ff20_0%,_transparent_70%)]">
+                  <h3 className="font-serif-elegant font-black text-6xl md:text-8xl leading-none text-center lg:text-left fade-in-up text-white" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
+                    The<br/>
+                    <span className="italic text-[#ff0055]">Rules.</span>
+                  </h3>
+                </div>
+                
+                <div className="flex flex-col">
+                  {rules.map((rule, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`p-6 md:p-12 hover-invert-cyan group cursor-default ${idx !== rules.length - 1 ? 'border-b border-grid' : ''} slide-in-right`}
+                      ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
+                      style={{ transitionDelay: `${idx * 0.15}s` }}
+                    >
+                      <div className="flex items-start gap-6 md:gap-12">
+                        <span className="text-2xl md:text-4xl font-serif-elegant font-black text-[#ccff00] group-hover:text-black mt-1">{rule.num}</span>
+                        <div>
+                          <h4 className="font-serif-elegant font-bold text-3xl md:text-5xl mb-4 group-hover:italic">{rule.title}</h4>
+                          <p className="text-sm md:text-base leading-relaxed opacity-80 font-sans group-hover:font-bold">{rule.text}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
@@ -459,46 +402,40 @@
           useEffect(() => observe(refs), [refs, observe]);
 
           const menuItems = [
-            { name: "BLACKOUT ESPRESSO", desc: "Our darkest roast. Tastes like battery acid and dark chocolate.", price: "₹300" },
-            { name: "TOXIC WASTE MATCHA", desc: "Ceremonial grade matcha loaded with extra caffeine. Glowing green.", price: "₹450" },
-            { name: "NITRO COLD BLOOD", desc: "Steeped for 48 hours. Infused with nitrogen. Served without ice.", price: "₹350" },
-            { name: "THE ANOMALY POUR-OVER", desc: "Rotating single origin. Exotic, fruity, completely unpredictable.", price: "₹400" },
+            { name: "Blackout Espresso", desc: "Darkest roast. Battery acid & dark chocolate.", price: "300" },
+            { name: "Crimson Pour-Over", desc: "Ethiopian origin. Tart, bright, highly acidic.", price: "450" },
+            { name: "Nitro Cold Blood", desc: "48-hour steep. Nitrogen infused. No ice.", price: "350" },
+            { name: "The Anomaly Drip", desc: "Rotating experimental single origin.", price: "400" },
           ];
 
           return (
-            <section id="menu" className="py-24 md:py-40 bg-[#09090b] relative border-y-4 border-white overflow-hidden brutal-grid">
-              <div className="max-w-5xl mx-auto px-4 relative z-10">
-                <div className="mb-16 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-                  <h2 className="text-[#ccff00] text-6xl md:text-8xl font-black uppercase tracking-tighter mb-4 inline-block bg-black px-4 py-2 border-4 border-[#ccff00] brutal-shadow transform -rotate-2">
-                    Fuel Menu
-                  </h2>
+            <section id="menu" className="border-b border-grid bg-[#0b001a]">
+              <div className="p-6 md:p-16 border-b border-grid relative overflow-hidden">
+                <div className="absolute -right-20 -top-20 text-[#00f3ff] opacity-10 animate-spin-slow">
+                  <Asterisk size={400} strokeWidth={0.5} />
                 </div>
+                <h3 className="text-xs uppercase tracking-[0.3em] text-[#ff0055] mb-2 fade-in-up font-bold" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>Section 04</h3>
+                <h2 className="font-serif-elegant font-black text-6xl md:text-8xl text-[#ccff00] fade-in-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>Fuel Menu</h2>
+              </div>
 
-                <div className="flex flex-col gap-6">
-                  {menuItems.map((item, index) => (
-                    <div 
-                      key={index}
-                      ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
-                      className="reveal-up border-4 border-white bg-[#1a1a1a] p-6 hover:bg-[#ccff00] hover:text-black hover:border-black hover:translate-x-4 transition-all duration-300 cursor-pointer group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-                      style={{ transitionDelay: `${index * 100}ms` }}
-                    >
-                      <div className="flex-1">
-                        <h3 className="text-2xl md:text-4xl font-black uppercase mb-2 group-hover:-translate-y-1 transition-transform">
-                          {item.name}
-                        </h3>
-                        <p className="font-bold text-[#a0a0a0] group-hover:text-black/70 text-sm md:text-lg">
-                          {item.desc}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t-4 border-[#333] group-hover:border-black pt-4 md:pt-0 md:border-t-0 md:pl-6 md:border-l-4">
-                        <span className="text-2xl md:text-3xl font-black tracking-tighter">{item.price}</span>
-                        <div className="bg-black text-white p-3 border-2 border-white group-hover:bg-[#ff00ff] group-hover:border-black group-hover:-rotate-45 transition-all">
-                          <ArrowRight size={24} />
-                        </div>
-                      </div>
+              <div className="flex flex-col">
+                {menuItems.map((item, index) => (
+                  <div 
+                    key={index}
+                    ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
+                    className={`slide-in-right p-6 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover-invert-pink cursor-pointer group ${index !== menuItems.length - 1 ? 'border-b border-grid' : ''}`}
+                    style={{ transitionDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="flex-1">
+                      <h4 className="font-serif-elegant font-bold text-3xl md:text-5xl mb-2 group-hover:italic">{item.name}</h4>
+                      <p className="text-sm tracking-wide opacity-70 group-hover:opacity-100 font-sans group-hover:font-bold">{item.desc}</p>
                     </div>
-                  ))}
-                </div>
+                    <div className="flex items-center gap-8 mt-4 md:mt-0">
+                      <span className="text-2xl md:text-4xl font-black tracking-widest text-[#00f3ff] group-hover:text-white">₹{item.price}</span>
+                      <ArrowRight size={32} className="opacity-0 group-hover:opacity-100 transform -translate-x-8 group-hover:translate-x-0 transition-all duration-300" />
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           );
@@ -511,107 +448,72 @@
           useEffect(() => observe(refs), [refs, observe]);
 
           const merch = [
-            { title: "HEAVY DUTY HOODIE", price: "₹2999", color: "bg-black text-white", shadow: "brutal-shadow" },
-            { title: "ACID ACID TEE", price: "₹1299", color: "bg-[#ccff00] text-black", shadow: "brutal-shadow-pink" },
-            { title: "TOXIC TOTE BAG", price: "₹799", color: "bg-[#ff00ff] text-black", shadow: "brutal-shadow" },
+            { title: "Heavy Duty Hoodie", price: "2999", color: "text-[#00f3ff]" },
+            { title: "Acid Drop Tee", price: "1299", color: "text-[#ff0055]" },
+            { title: "Toxic Tote Bag", price: "799", color: "text-[#ccff00]" },
           ];
 
           return (
-            <section id="merch" className="py-24 md:py-40 bg-[#7000ff] border-b-4 border-white">
-              <div className="max-w-7xl mx-auto px-6">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-                  <h2 className="text-[#fafafa] text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none text-shadow-solid" style={{ textShadow: '4px 4px 0px black' }}>
-                    Hardware <br/> & Merch
-                  </h2>
-                  <button className="brutal-border bg-[#ccff00] text-black px-8 py-4 font-black uppercase text-xl brutal-shadow hover:bg-white transition-colors">
-                    Shop All Drop
-                  </button>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-                  {merch.map((item, idx) => (
-                    <div 
-                      key={idx} 
-                      ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
-                      className={`reveal-scale ${item.color} brutal-border ${item.shadow} aspect-[4/5] p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden`}
-                      style={{ transitionDelay: `${idx * 150}ms` }}
-                    >
-                      <div className="absolute inset-0 flex items-center justify-center opacity-10 group-hover:scale-110 transition-transform duration-500">
-                        <Skull size={200} />
-                      </div>
-                      <div className="flex justify-between items-start relative z-10">
-                        <span className="bg-white text-black font-black px-3 py-1 text-sm brutal-border">NEW</span>
-                        <span className="font-black text-2xl">{item.price}</span>
-                      </div>
-                      <h3 className="text-4xl font-black uppercase leading-none mt-auto relative z-10 group-hover:underline underline-offset-8">
-                        {item.title}
-                      </h3>
+            <section id="merch" className="border-b border-grid bg-[#0b001a]">
+              <Marquee text="HARDWARE DROP /// HARDWARE DROP" bg="bg-[#00f3ff]" color="text-black" border="border-b border-grid" size="text-xl" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-3">
+                {merch.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
+                    className={`fade-in-up aspect-square p-8 flex flex-col justify-between cursor-pointer group hover-invert-pink ${idx !== 2 ? 'border-b md:border-b-0 md:border-r border-grid' : ''}`}
+                    style={{ transitionDelay: `${idx * 0.15}s` }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs border border-current px-2 py-1 uppercase tracking-widest font-bold">New</span>
+                      <span className="text-xl font-bold tracking-widest">₹{item.price}</span>
                     </div>
-                  ))}
-                </div>
+                    
+                    <div className="flex flex-col items-center justify-center flex-1 my-8">
+                       <span className={`font-serif-elegant font-black text-8xl transition-all duration-300 group-hover:scale-125 group-hover:rotate-12 ${item.color} group-hover:text-white`}>K</span>
+                    </div>
+
+                    <h3 className="font-serif-elegant font-bold text-3xl md:text-4xl leading-tight group-hover:italic">
+                      {item.title}
+                    </h3>
+                  </div>
+                ))}
               </div>
             </section>
           );
         };
 
         const Footer = () => (
-          <footer className="bg-black pt-24 pb-8 overflow-hidden relative border-t-4 border-white">
-            <div className="max-w-7xl mx-auto px-6 mb-24 relative z-10 flex flex-col md:flex-row justify-between items-end gap-12">
-              <div>
-                <h2 className="font-malayalam text-[#ccff00] glitch-hover" style={{ fontSize: 'clamp(4rem, 15vw, 10rem)', lineHeight: 0.8 }}>കാപ്പി</h2>
-                <p className="text-[#fafafa] font-black uppercase text-xl mt-6 tracking-widest">Destroying morning routines since 2026.</p>
-              </div>
-              
-              <div className="flex flex-col gap-4 text-right">
-                {['Instagram', 'TikTok', 'Discord', 'Location'].map(link => (
-                  <a key={link} href="#" className="text-3xl font-black uppercase text-white hover:text-[#ff00ff] hover:translate-x-[-10px] transition-all flex items-center justify-end gap-2 group">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                    {link}
-                  </a>
-                ))}
-              </div>
+          <footer className="p-6 md:p-16 flex flex-col md:flex-row justify-between items-end gap-12 bg-[#ccff00] text-black">
+            <div>
+              <h2 className="font-malayalam font-black text-6xl md:text-8xl leading-none mb-6 hover-jitter">കാപ്പി</h2>
+              <p className="text-xs uppercase tracking-[0.2em] font-bold">Copyright © 2026. All Rights Reserved.</p>
             </div>
             
-            <Marquee text="STAY AWAKE // KĀPPI COFFEE // STAY AWAKE" bg="bg-[#ff00ff]" color="text-black" border="border-t-4 border-white" />
+            <div className="flex flex-col gap-2 text-right text-sm uppercase tracking-widest font-bold">
+              <a href="#" className="hover:text-[#ff0055] transition-colors">Instagram</a>
+              <a href="#" className="hover:text-[#ff0055] transition-colors">Location</a>
+              <a href="#" className="hover:text-[#ff0055] transition-colors">Contact</a>
+            </div>
           </footer>
         );
 
         function App() {
-          const [isLoading, setIsLoading] = useState(true);
-          const [isFading, setIsFading] = useState(false);
-
-          useEffect(() => {
-            document.body.classList.add('loading-locked');
-
-            const fadeTimer = setTimeout(() => {
-              setIsFading(true);
-            }, 2200);
-
-            const removeTimer = setTimeout(() => {
-              setIsLoading(false);
-              document.body.classList.remove('loading-locked');
-            }, 3000);
-
-            return () => {
-              clearTimeout(fadeTimer);
-              clearTimeout(removeTimer);
-              document.body.classList.remove('loading-locked');
-            };
-          }, []);
-
           return (
             <>
               <CustomStyles />
-              {isLoading && <BrutalistLoader isFading={isFading} />}
-              <Header />
-              <main>
-                <HeroSection />
-                <ScrollytellingProtocol />
-                <ManifestoSection />
-                <MenuSection />
-                <MerchSection />
-              </main>
-              <Footer />
+              <div className="flex flex-col md:flex-row min-h-screen">
+                <Sidebar />
+                <main className="w-full md:w-3/4 flex flex-col border-l border-grid">
+                  <HeroSection />
+                  <ScrollytellingProtocol />
+                  <PhilosophySection />
+                  <MenuSection />
+                  <MerchSection />
+                  <Footer />
+                </main>
+              </div>
             </>
           );
         }
