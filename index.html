@@ -1,608 +1,609 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Zap, Flame, ShoppingBag, Asterisk, Skull, Crosshair, Droplets } from 'lucide-react';
-
-// --- Global Styles & Keyframes ---
-const CustomStyles = () => (
-  <style dangerouslySetInnerHTML={{__html: `
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Malayalam:wght@900&family=Space+Grotesk:wght@400;700;900&display=swap');
-
-    :root {
-      --bg: #09090b;       /* Deep Space Black */
-      --fg: #fafafa;       /* Off White */
-      --acid: #ccff00;     /* Acid Green */
-      --pink: #ff00ff;     /* Hyper Pink */
-      --purple: #7000ff;   /* Digital Purple */
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--fg);
-      font-family: 'Space Grotesk', sans-serif;
-      overflow-x: hidden;
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body.loading-locked {
-      overflow: hidden;
-      height: 100vh;
-    }
-
-    .font-malayalam {
-      font-family: 'Noto Serif Malayalam', serif;
-    }
-
-    /* --- Neo-Brutalist Utilities --- */
-    .brutal-border {
-      border: 3px solid var(--fg);
-    }
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Pro - The Future is Here</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     
-    .brutal-shadow {
-      box-shadow: 6px 6px 0px var(--acid);
-      transition: all 0.2s ease;
-    }
-    
-    .brutal-shadow:hover {
-      box-shadow: 2px 2px 0px var(--acid);
-      transform: translate(4px, 4px);
-    }
-
-    .brutal-shadow-pink {
-      box-shadow: 6px 6px 0px var(--pink);
-      transition: all 0.2s ease;
-    }
-
-    .brutal-shadow-pink:hover {
-      box-shadow: 2px 2px 0px var(--pink);
-      transform: translate(4px, 4px);
-    }
-
-    .brutal-grid {
-      background-image: radial-gradient(rgba(250,250,250,0.15) 2px, transparent 2px);
-      background-size: 30px 30px;
-    }
-
-    /* --- Animations --- */
-    @keyframes marquee {
-      0% { transform: translateX(0%); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .animate-marquee {
-      display: inline-block;
-      white-space: nowrap;
-      animation: marquee 15s linear infinite;
-    }
-
-    @keyframes spin-slow {
-      100% { transform: rotate(360deg); }
-    }
-
-    .animate-spin-slow {
-      animation: spin-slow 8s linear infinite;
-    }
-
-    @keyframes pulse-acid {
-      0%, 100% { filter: drop-shadow(0 0 15px rgba(204, 255, 0, 0.2)); }
-      50% { filter: drop-shadow(0 0 30px rgba(204, 255, 0, 0.8)); }
-    }
-
-    .acid-glow {
-      animation: pulse-acid 2s infinite;
-    }
-
-    @keyframes glitch {
-      0% { transform: translate(0) }
-      20% { transform: translate(-2px, 2px) }
-      40% { transform: translate(-2px, -2px) }
-      60% { transform: translate(2px, 2px) }
-      80% { transform: translate(2px, -2px) }
-      100% { transform: translate(0) }
-    }
-
-    .glitch-hover:hover {
-      animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
-      color: var(--acid);
-    }
-
-    /* --- Loader Cup Animations --- */
-    .loader-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--pink);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-    }
-
-    .loader-overlay.slide-up {
-      transform: translateY(-100%);
-    }
-
-    .cup-fill {
-      animation: fillUp 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    }
-
-    @keyframes fillUp {
-      0% { height: 0%; }
-      100% { height: 95%; }
-    }
-
-    .steam-block {
-      animation: rise 1.5s infinite linear;
-    }
-
-    .steam-block:nth-child(2) { animation-delay: 0.5s; }
-    .steam-block:nth-child(3) { animation-delay: 1s; }
-
-    @keyframes rise {
-      0% { transform: translateY(0) scale(1); opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
-    }
-
-    /* --- Scroll Reveals --- */
-    .reveal-up {
-      opacity: 0;
-      transform: translateY(60px);
-      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    
-    .reveal-up.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-scale {
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .reveal-scale.is-visible {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* --- Custom Scrollbar --- */
-    ::-webkit-scrollbar { width: 12px; }
-    ::-webkit-scrollbar-track { background: var(--bg); border-left: 2px solid var(--fg); }
-    ::-webkit-scrollbar-thumb { background: var(--acid); border: 2px solid var(--bg); }
-  `}} />
-);
-
-// --- Hooks ---
-const useIntersectionObserver = (options) => {
-  const [elements, setElements] = useState([]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        html {
+            scroll-behavior: smooth;
         }
-      });
-    }, options);
 
-    elements.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, [elements, options]);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000;
+            color: #f5f5f7;
+            overflow-x: hidden;
+        }
 
-  return setElements;
-};
+        /* Dynamically applied class to hide native cursor once mouse is detected */
+        .cursor-none-global, .cursor-none-global * {
+            cursor: none !important;
+        }
 
-const useScroll = () => {
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    // Trigger initial calculation
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  return scrollY;
-};
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
 
-// --- Components ---
-
-const BrutalistLoader = ({ isFading }) => (
-  <div className={`loader-overlay ${isFading ? 'slide-up' : ''} brutal-grid`}>
-    {/* Steam Blocks */}
-    <div className="flex gap-4 mb-4">
-      <div className="w-4 h-4 bg-black steam-block"></div>
-      <div className="w-6 h-6 bg-black steam-block"></div>
-      <div className="w-4 h-4 bg-black steam-block"></div>
-    </div>
-    
-    <div className="flex items-end mb-8 relative z-10 transform scale-125">
-      {/* Cup Body */}
-      <div className="w-32 h-40 border-[8px] border-black bg-white relative overflow-hidden shadow-[8px_8px_0px_#ccff00]">
-        {/* Acid Liquid Fill */}
-        <div className="absolute bottom-0 left-0 right-0 bg-[#09090b] cup-fill">
-           {/* Liquid details */}
-           <div className="absolute top-2 left-2 w-4 h-12 bg-white/20"></div>
-        </div>
-        {/* Inner Cup Border Decor */}
-        <div className="absolute top-3 left-3 right-3 bottom-3 border-4 border-black/10 pointer-events-none z-10"></div>
-      </div>
-      {/* Cup Handle */}
-      <div className="w-12 h-20 border-[8px] border-black border-l-0 mb-6 shadow-[8px_8px_0px_#ccff00] relative -left-2 z-0"></div>
-    </div>
-    
-    <h1 className="font-malayalam text-black text-6xl font-black mb-2 animate-pulse">കാപ്പി</h1>
-    <div className="font-black text-xl uppercase tracking-widest text-black bg-white px-4 py-1 border-4 border-black transform -rotate-2">
-      Brewing Protocol...
-    </div>
-  </div>
-);
-
-const Marquee = ({ text, bg = "bg-[#ccff00]", color = "text-black", border = "border-y-4 border-black" }) => (
-  <div className={`w-full overflow-hidden ${bg} ${color} ${border} py-3 flex relative z-10 font-black text-2xl md:text-4xl uppercase tracking-tighter`}>
-    <div className="animate-marquee whitespace-nowrap">
-      <span className="mx-4">{text}</span>
-      <span className="mx-4">///</span>
-      <span className="mx-4">{text}</span>
-      <span className="mx-4">///</span>
-      <span className="mx-4">{text}</span>
-      <span className="mx-4">///</span>
-      <span className="mx-4">{text}</span>
-      <span className="mx-4">///</span>
-      <span className="mx-4">{text}</span>
-      <span className="mx-4">///</span>
-      <span className="mx-4">{text}</span>
-    </div>
-  </div>
-);
-
-const Header = () => {
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#09090b] border-b-4 border-[#fafafa]">
-      <div className="w-full flex justify-between items-stretch">
-        <div className="flex items-center gap-3 px-6 py-4 border-r-4 border-[#fafafa] bg-[#ccff00] text-black">
-          <Zap size={24} className="animate-pulse" fill="currentColor" />
-          <span className="font-malayalam text-2xl font-black tracking-widest leading-none mt-1">കാപ്പി</span>
-        </div>
+        /* Text Gradients */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         
-        <nav className="flex items-stretch text-sm md:text-base font-bold uppercase tracking-widest">
-          <a href="#process" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#ff00ff] hover:text-black transition-colors">Protocol</a>
-          <a href="#manifesto" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#7000ff] hover:text-white transition-colors">Manifesto</a>
-          <a href="#menu" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] hover:bg-[#ccff00] hover:text-black transition-colors">Menu</a>
-          <a href="#merch" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] bg-[#fafafa] text-black hover:bg-[#ccff00] transition-colors gap-2">
-            <span>Merch</span>
-            <ShoppingBag size={18} />
-          </a>
+        .bg-gradient-hero {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+
+        .bg-gradient-titanium {
+            background: linear-gradient(to right, #8a8a8e, #c7c7cc, #8a8a8e);
+        }
+
+        .bg-gradient-screen-1 {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        .bg-gradient-screen-2 {
+            background: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+        }
+
+        .bg-gradient-screen-3 {
+            background: radial-gradient(circle at center, #ff0844 0%, #ffb199 100%);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: flex;
+            white-space: nowrap;
+            width: fit-content;
+            animation: marquee 25s linear infinite;
+        }
+
+        /* CSS Phone Model Styling */
+        .phone-bezel {
+            box-shadow: inset 0 0 0 4px #444, inset 0 0 0 8px #111, 0 25px 50px -12px rgba(255, 255, 255, 0.15);
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Glowing backdrop */
+        .phone-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 110%;
+            background: radial-gradient(circle, rgba(142, 197, 252, 0.2) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="selection:bg-white selection:text-black">
+
+    <!-- Custom Cursor Elements (Hidden until mouse moves) -->
+    <div id="cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference opacity-0 -ml-1 -mt-1"></div>
+    <div id="cursor-outline" class="fixed top-0 left-0 w-10 h-10 border border-white/50 rounded-full pointer-events-none z-[9999] mix-blend-difference opacity-0 -ml-5 -mt-5 transition-[transform,background-color] duration-300 ease-out"></div>
+
+    <!-- Header (Marquee + Navigation) -->
+    <header class="fixed top-0 w-full z-[100] transition-all duration-300">
+        <!-- Marquee Bar -->
+        <div class="w-full bg-zinc-900 text-gray-300 border-b border-white/10 overflow-hidden py-1.5 flex text-[10px] sm:text-xs font-semibold tracking-widest uppercase relative z-[101]">
+            <div class="animate-marquee items-center">
+                <!-- Group 1 -->
+                <span class="mx-8">Pre-order begins Friday at 5:00 a.m. PDT.</span> •
+                <span class="mx-8">Trade in your current device for up to $650 credit.</span> •
+                <span class="mx-8">Free shipping and returns.</span> •
+                <!-- Group 2 (Duplicate for seamless loop) -->
+                <span class="mx-8">Pre-order begins Friday at 5:00 a.m. PDT.</span> •
+                <span class="mx-8">Trade in your current device for up to $650 credit.</span> •
+                <span class="mx-8">Free shipping and returns.</span> •
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="w-full bg-black/50 backdrop-blur-md border-b border-white/10 relative z-[100]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-14">
+                    <div class="flex-shrink-0 font-semibold text-lg tracking-tight">
+                        Aura
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-8 text-xs font-medium text-gray-300">
+                            <a href="#overview" class="hover:text-white transition-colors py-2">Overview</a>
+                            <a href="#design" class="hover:text-white transition-colors py-2">Design</a>
+                            <a href="#cameras" class="hover:text-white transition-colors py-2">Cameras</a>
+                            <a href="#specs" class="hover:text-white transition-colors py-2">Specs</a>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="#buy" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-gray-200 transition-colors">Buy</a>
+                    </div>
+                </div>
+            </div>
         </nav>
-      </div>
     </header>
-  );
-};
 
-const HeroSection = () => {
-  return (
-    <section className="relative min-h-screen pt-24 flex flex-col justify-between overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_#1a1a1a_0%,_#09090b_100%)]">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-1/4 left-10 text-[#ccff00] opacity-20 animate-spin-slow">
-        <Asterisk size={200} />
-      </div>
-      <div className="absolute bottom-1/4 right-10 text-[#ff00ff] opacity-20 animate-spin-slow" style={{ animationDirection: 'reverse' }}>
-        <Crosshair size={180} />
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center px-4 text-center z-10 relative">
-        <div className="inline-block bg-[#ff00ff] text-black font-black uppercase tracking-widest px-4 py-2 mb-6 border-2 border-white transform -rotate-3 hover:rotate-0 transition-transform cursor-crosshair">
-          Version 2.0 // High Voltage
-        </div>
+    <!-- Main Scroll Container (Used by GSAP) -->
+    <main id="scroll-container" class="relative w-full h-[500vh] pt-[84px]">
         
-        <h1 className="font-malayalam font-black text-[#fafafa] mb-2 leading-none acid-glow glitch-hover"
-            style={{ fontSize: 'clamp(5rem, 20vw, 15rem)', textShadow: '8px 8px 0px #ccff00' }}>
-          കാപ്പി
-        </h1>
-        
-        <p className="text-[#fafafa] font-black uppercase text-2xl md:text-5xl tracking-tighter max-w-4xl mx-auto leading-none mt-4">
-          Not your parents' <br className="md:hidden" /> boring morning drip.
-        </p>
-      </div>
+        <!-- Sticky Viewport -->
+        <div class="sticky top-[84px] left-0 w-full h-[calc(100vh-84px)] overflow-hidden flex items-center justify-center">
+            
+            <!-- Global Phone Glow -->
+            <div class="phone-glow" id="glow"></div>
 
-      <Marquee text="LIQUID ADRENALINE" />
-    </section>
-  );
-};
-
-// --- Scrollytelling Section ---
-const ScrollytellingProtocol = () => {
-  const scrollY = useScroll();
-  const sectionRef = useRef(null);
-  const [offsetTop, setOffsetTop] = useState(0);
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    if (sectionRef.current) {
-      setOffsetTop(sectionRef.current.offsetTop);
-      setHeight(sectionRef.current.offsetHeight);
-    }
-  }, [scrollY]); // Depend on scrollY to recalculate if layout shifts
-
-  // Calculate normalized progress (0 to 1) within this specific section
-  const windowHeight = window.innerHeight;
-  const relativeScroll = Math.max(0, scrollY - offsetTop);
-  const scrollableDistance = height - windowHeight;
-  let progress = 0;
-  if (scrollableDistance > 0) {
-    progress = Math.min(1, relativeScroll / scrollableDistance);
-  }
-
-  // Determine State
-  let phase = "CRUSH";
-  let bg = "bg-[#09090b]";
-  let color = "text-[#ccff00]";
-  
-  if (progress > 0.33) {
-    phase = "BOIL";
-    bg = "bg-[#ff00ff]";
-    color = "text-black";
-  }
-  if (progress > 0.66) {
-    phase = "EXTRACT";
-    bg = "bg-[#ccff00]";
-    color = "text-black";
-  }
-
-  // Scale and Opacity logic for the text
-  const subProgress = (progress % 0.33) * 3; // 0 to 1 for each phase segment
-  const textScale = 1 + (subProgress * 1.5);
-  const textOpacity = 1 - (subProgress * 0.4);
-
-  return (
-    <section id="process" ref={sectionRef} className="h-[300vh] relative border-y-4 border-white">
-      <div className={`sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden transition-colors duration-700 brutal-grid ${bg}`}>
-        
-        {/* Parallax Background Shapes driven by scroll */}
-        <div 
-          className="absolute opacity-30 text-current"
-          style={{ transform: `translate(-30vw, ${-50 + (progress * 100)}vh) rotate(${progress * 360}deg)` }}
-        >
-          <Skull size={150} />
-        </div>
-        <div 
-          className="absolute opacity-30 text-current"
-          style={{ transform: `translate(30vw, ${100 - (progress * 150)}vh) rotate(${-progress * 180}deg)` }}
-        >
-          <Droplets size={200} />
-        </div>
-
-        {/* Dynamic Sticky Text */}
-        <h2 
-          className={`font-black uppercase tracking-tighter leading-none select-none z-10 text-center ${color}`}
-          style={{ 
-            fontSize: '15vw',
-            transform: `scale(${textScale})`,
-            opacity: textOpacity,
-            textShadow: phase === "BOIL" ? '8px 8px 0px white' : '8px 8px 0px black'
-          }}
-        >
-          {phase}
-        </h2>
-
-        {/* Phase Subtitle */}
-        <div className={`absolute bottom-20 px-6 py-2 border-4 z-10 font-black uppercase text-2xl tracking-widest bg-black text-white`}>
-          Protocol {progress > 0.66 ? '03' : progress > 0.33 ? '02' : '01'}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const ManifestoSection = () => {
-  const [refs, setRefs] = useState([]);
-  const observe = useIntersectionObserver({ threshold: 0.2 });
-
-  useEffect(() => observe(refs), [refs, observe]);
-
-  return (
-    <section id="manifesto" className="py-24 md:py-40 bg-[#fafafa] text-black relative">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="grid md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-4 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-             <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
-               The <br/><span className="text-[#ff00ff]">Rule</span><br/>Book
-             </h2>
-             <div className="w-full h-4 bg-[#ccff00] brutal-border border-black"></div>
-          </div>
-          
-          <div className="md:col-span-8 flex flex-col gap-12">
-            {[
-              { num: "01", title: "DEATH TO DECAF", text: "We roast beans that punch you in the face. If you want colored water, go somewhere else. We extract maximum flavor, maximum caffeine, zero apologies." },
-              { num: "02", title: "LOCALLY DISRUPTIVE", text: "Sourced from the wildest estates. Roasted in a garage. Served with attitude. Every batch is an experiment in pushing the limits of the Maillard reaction." },
-              { num: "03", title: "NO SYRUPS. JUST BEANS.", text: "Don't ask for a caramel-pumpkin-vanilla-swirl. We respect the bean. We respect the roast. If you need sugar to hide the taste, you're drinking bad coffee." }
-            ].map((rule, idx) => (
-              <div key={idx} className="group reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-                <div className="flex gap-4 items-start border-t-4 border-black pt-6">
-                  <span className="text-4xl md:text-6xl font-black text-transparent" style={{ WebkitTextStroke: '2px black' }}>{rule.num}</span>
-                  <div>
-                    <h3 className="text-2xl md:text-4xl font-black uppercase mb-4 group-hover:text-[#ff00ff] transition-colors">{rule.title}</h3>
-                    <p className="text-lg md:text-xl font-bold leading-snug">{rule.text}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const MenuSection = () => {
-  const [refs, setRefs] = useState([]);
-  const observe = useIntersectionObserver({ threshold: 0.1 });
-
-  useEffect(() => observe(refs), [refs, observe]);
-
-  const menuItems = [
-    { name: "BLACKOUT ESPRESSO", desc: "Our darkest roast. Tastes like battery acid and dark chocolate.", price: "₹300" },
-    { name: "TOXIC WASTE MATCHA", desc: "Ceremonial grade matcha loaded with extra caffeine. Glowing green.", price: "₹450" },
-    { name: "NITRO COLD BLOOD", desc: "Steeped for 48 hours. Infused with nitrogen. Served without ice.", price: "₹350" },
-    { name: "THE ANOMALY POUR-OVER", desc: "Rotating single origin. Exotic, fruity, completely unpredictable.", price: "₹400" },
-  ];
-
-  return (
-    <section id="menu" className="py-24 md:py-40 bg-[#09090b] relative border-y-4 border-white overflow-hidden brutal-grid">
-      <div className="max-w-5xl mx-auto px-4 relative z-10">
-        <div className="mb-16 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-          <h2 className="text-[#ccff00] text-6xl md:text-8xl font-black uppercase tracking-tighter mb-4 inline-block bg-black px-4 py-2 border-4 border-[#ccff00] brutal-shadow transform -rotate-2">
-            Fuel Menu
-          </h2>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          {menuItems.map((item, index) => (
-            <div 
-              key={index}
-              ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
-              className="reveal-up border-4 border-white bg-[#1a1a1a] p-6 hover:bg-[#ccff00] hover:text-black hover:border-black hover:translate-x-4 transition-all duration-300 cursor-pointer group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <div className="flex-1">
-                <h3 className="text-2xl md:text-4xl font-black uppercase mb-2 group-hover:-translate-y-1 transition-transform">
-                  {item.name}
-                </h3>
-                <p className="font-bold text-[#a0a0a0] group-hover:text-black/70 text-sm md:text-lg">
-                  {item.desc}
+            <!-- TEXT LAYERS (Absolute positioned in the center, animated via GSAP) -->
+            
+            <!-- Phase 1: Hero -->
+            <div id="text-phase-1" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30">
+                <h1 class="text-6xl md:text-8xl font-bold tracking-tighter text-transparent bg-gradient-hero bg-clip-text text-center mb-4">
+                    Aura Pro.
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-400 font-medium tracking-wide">
+                    Titanium. Tough. Transformative.
                 </p>
-              </div>
-              <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end border-t-4 border-[#333] group-hover:border-black pt-4 md:pt-0 md:border-t-0 md:pl-6 md:border-l-4">
-                <span className="text-2xl md:text-3xl font-black tracking-tighter">{item.price}</span>
-                <div className="bg-black text-white p-3 border-2 border-white group-hover:bg-[#ff00ff] group-hover:border-black group-hover:-rotate-45 transition-all">
-                  <ArrowRight size={24} />
+            </div>
+
+            <!-- Phase 2: Display -->
+            <div id="text-phase-2" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30 opacity-0 translate-y-12">
+                <h2 class="text-5xl md:text-7xl font-semibold tracking-tighter text-white text-center mb-4">
+                    Brilliance in <br> <span class="text-gray-500">every pixel.</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-md text-center mt-4">
+                    The brightest, most vibrant Super Retina XDR display ever. With ProMotion for impossibly smooth interactions.
+                </p>
+            </div>
+
+            <!-- Phase 3: Performance (Landscape side text) -->
+            <div id="text-phase-3" class="absolute left-[5%] md:left-[10%] top-1/2 -translate-y-1/2 flex flex-col items-start justify-center pointer-events-none z-30 opacity-0">
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tighter text-white mb-4">
+                    A18 Bionic.<br>Mind-bending.
+                </h2>
+                <p class="text-lg text-gray-400 max-w-sm mt-4">
+                    The fastest chip ever in a smartphone. Period. Unleashing next-level gaming and computational photography.
+                </p>
+            </div>
+
+            <!-- Phase 4: Camera System -->
+            <div id="text-phase-4" class="absolute right-[5%] md:right-[10%] top-1/2 -translate-y-1/2 flex flex-col items-start justify-center pointer-events-none z-30 opacity-0 text-right">
+                <h2 class="text-5xl md:text-6xl font-bold tracking-tighter text-white mb-4 w-full">
+                    Pro Camera.<br> <span class="text-transparent bg-gradient-titanium bg-clip-text">Beyond Pro.</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-sm mt-4 ml-auto">
+                    A massive 48MP Main camera. Capturing mind-blowing detail and up to 4x resolution.
+                </p>
+            </div>
+
+            <!-- THE PHONE MOCKUP (Pure CSS/HTML) -->
+            <!-- Initial state: scaled down, bottom of screen -->
+            <div id="phone-wrapper" class="relative z-20 translate-y-[30vh] scale-[0.6]">
+                
+                <div id="phone" class="relative w-[320px] h-[660px] bg-zinc-900 rounded-[55px] phone-bezel p-[12px] flex items-center justify-center shadow-2xl">
+                    
+                    <!-- Hardware Buttons -->
+                    <div class="absolute -left-[4px] top-[120px] w-[4px] h-[30px] bg-zinc-700 rounded-l-md"></div> <!-- Mute -->
+                    <div class="absolute -left-[4px] top-[170px] w-[4px] h-[60px] bg-zinc-700 rounded-l-md"></div> <!-- Vol Up -->
+                    <div class="absolute -left-[4px] top-[240px] w-[4px] h-[60px] bg-zinc-700 rounded-l-md"></div> <!-- Vol Down -->
+                    <div class="absolute -right-[4px] top-[190px] w-[4px] h-[90px] bg-zinc-700 rounded-r-md"></div> <!-- Power -->
+
+                    <!-- Screen -->
+                    <div class="relative w-full h-full bg-black rounded-[42px] overflow-hidden flex flex-col border border-white/10">
+                        
+                        <!-- Dynamic Island (Top Notch) -->
+                        <div class="absolute top-[12px] left-1/2 -translate-x-1/2 w-[110px] h-[32px] bg-black rounded-full z-50 flex items-center justify-between px-3 shadow-sm border border-white/5">
+                            <!-- Camera sensors inside island -->
+                            <div class="w-[12px] h-[12px] rounded-full bg-[#111] shadow-inner flex items-center justify-center">
+                                <div class="w-[4px] h-[4px] rounded-full bg-blue-900/50"></div>
+                            </div>
+                            <div class="w-[12px] h-[12px] rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden relative">
+                                <div class="w-[4px] h-[4px] rounded-full bg-purple-500/30"></div>
+                            </div>
+                        </div>
+
+                        <!-- Screen Wallpapers (Layered, opacity animated via GSAP) -->
+                        <div id="screen-wp-1" class="absolute inset-0 bg-gradient-screen-1 z-10"></div>
+                        <div id="screen-wp-2" class="absolute inset-0 bg-gradient-screen-2 z-20 opacity-0"></div>
+                        <div id="screen-wp-3" class="absolute inset-0 bg-black z-30 opacity-0 flex items-center justify-center">
+                            <!-- Camera UI mockup -->
+                            <div class="w-full h-full relative">
+                                <div class="absolute inset-0 bg-gradient-screen-3 opacity-60"></div>
+                                <div class="absolute bottom-10 left-0 w-full flex justify-center gap-6 items-center">
+                                    <div class="w-12 h-12 rounded-full bg-zinc-800/80 border border-white/20"></div>
+                                    <div class="w-16 h-16 rounded-full border-[3px] border-white p-1">
+                                        <div class="w-full h-full bg-white rounded-full"></div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-zinc-800/80 border border-white/20"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Simple Mock UI Elements (Status bar, home bar) -->
+                        <div class="absolute top-4 right-6 z-40 flex items-center gap-1.5 opacity-80">
+                            <div class="w-[18px] h-[10px] border-[1px] border-white rounded-[3px] p-[1px] flex">
+                                <div class="bg-white h-full w-[80%] rounded-[1px]"></div>
+                            </div>
+                        </div>
+                        <div class="absolute top-4 left-7 z-40 opacity-80">
+                            <span class="text-[11px] font-semibold text-white tracking-wider">9:41</span>
+                        </div>
+                        <!-- Home Indicator -->
+                        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white rounded-full z-40 opacity-80"></div>
+                    </div>
                 </div>
-              </div>
             </div>
-          ))}
+
         </div>
-      </div>
-    </section>
-  );
-};
+    </main>
 
-const MerchSection = () => {
-  const [refs, setRefs] = useState([]);
-  const observe = useIntersectionObserver({ threshold: 0.1 });
-
-  useEffect(() => observe(refs), [refs, observe]);
-
-  const merch = [
-    { title: "HEAVY DUTY HOODIE", price: "₹2999", color: "bg-black text-white", shadow: "brutal-shadow" },
-    { title: "ACID ACID TEE", price: "₹1299", color: "bg-[#ccff00] text-black", shadow: "brutal-shadow-pink" },
-    { title: "TOXIC TOTE BAG", price: "₹799", color: "bg-[#ff00ff] text-black", shadow: "brutal-shadow" },
-  ];
-
-  return (
-    <section id="merch" className="py-24 md:py-40 bg-[#7000ff] border-b-4 border-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
-          <h2 className="text-[#fafafa] text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none text-shadow-solid" style={{ textShadow: '4px 4px 0px black' }}>
-            Hardware <br/> & Merch
-          </h2>
-          <button className="brutal-border bg-[#ccff00] text-black px-8 py-4 font-black uppercase text-xl brutal-shadow hover:bg-white transition-colors">
-            Shop All Drop
-          </button>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-          {merch.map((item, idx) => (
-            <div 
-              key={idx} 
-              ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
-              className={`reveal-scale ${item.color} brutal-border ${item.shadow} aspect-[4/5] p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden`}
-              style={{ transitionDelay: `${idx * 150}ms` }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <Skull size={200} />
-              </div>
-              <div className="flex justify-between items-start relative z-10">
-                <span className="bg-white text-black font-black px-3 py-1 text-sm brutal-border">NEW</span>
-                <span className="font-black text-2xl">{item.price}</span>
-              </div>
-              <h3 className="text-4xl font-black uppercase leading-none mt-auto relative z-10 group-hover:underline underline-offset-8">
-                {item.title}
-              </h3>
+    <!-- Overview Section -->
+    <section id="overview" class="relative bg-black py-32 border-t border-white/10 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="gsap-reveal text-4xl md:text-5xl font-bold tracking-tight mb-16 text-center text-white">The core of innovation.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="gsap-stagger-card bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-hero bg-clip-text text-xl font-bold mb-4">A18 Pro Chip</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">Mind-blowing speed.</h3>
+                    <p class="text-gray-400 leading-relaxed">Next-generation performance and efficiency. Featuring a 6-core GPU for console-level gaming right in your pocket.</p>
+                </div>
+                <div class="gsap-stagger-card bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-titanium bg-clip-text text-xl font-bold mb-4">Titanium Build</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">Light. Strong. Pro.</h3>
+                    <p class="text-gray-400 leading-relaxed">Aerospace-grade titanium makes Aura Pro incredibly durable yet remarkably lightweight in the hand.</p>
+                </div>
+                <div class="gsap-stagger-card bg-zinc-900 p-10 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300">
+                    <div class="text-transparent bg-gradient-screen-1 bg-clip-text text-xl font-bold mb-4">Battery Life</div>
+                    <h3 class="text-3xl font-semibold text-white mb-4">All-day power.</h3>
+                    <p class="text-gray-400 leading-relaxed">Up to 29 hours of video playback. Advanced power management means your device lasts as long as you do.</p>
+                </div>
             </div>
-          ))}
         </div>
-      </div>
     </section>
-  );
-};
 
-const Footer = () => (
-  <footer className="bg-black pt-24 pb-8 overflow-hidden relative border-t-4 border-white">
-    <div className="max-w-7xl mx-auto px-6 mb-24 relative z-10 flex flex-col md:flex-row justify-between items-end gap-12">
-      <div>
-        <h2 className="font-malayalam text-[#ccff00] glitch-hover" style={{ fontSize: 'clamp(4rem, 15vw, 10rem)', lineHeight: 0.8 }}>കാപ്പി</h2>
-        <p className="text-[#fafafa] font-black uppercase text-xl mt-6 tracking-widest">Destroying morning routines since 2026.</p>
-      </div>
-      
-      <div className="flex flex-col gap-4 text-right">
-        {['Instagram', 'TikTok', 'Discord', 'Location'].map(link => (
-          <a key={link} href="#" className="text-3xl font-black uppercase text-white hover:text-[#ff00ff] hover:translate-x-[-10px] transition-all flex items-center justify-end gap-2 group">
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-            {link}
-          </a>
-        ))}
-      </div>
-    </div>
-    
-    <Marquee text="STAY AWAKE // KĀPPI COFFEE // STAY AWAKE" bg="bg-[#ff00ff]" color="text-black" border="border-t-4 border-white" />
-  </footer>
-);
+    <!-- Design Section -->
+    <section id="design" class="relative bg-zinc-950 py-32 border-t border-white/10 z-40 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-16">
+            <div class="gsap-slide-right flex-1 z-10">
+                <h2 class="text-5xl md:text-7xl font-bold tracking-tighter mb-8 text-white">Forged in <br><span class="text-transparent bg-gradient-titanium bg-clip-text">Titanium</span>.</h2>
+                <p class="text-xl text-gray-400 mb-6 leading-relaxed">Aura Pro features a stunning aerospace-grade titanium design, using the same alloy that spacecraft use for missions to Mars.</p>
+                <p class="text-xl text-gray-400 leading-relaxed">It has one of the highest strength-to-weight ratios of any metal, making these our lightest Pro models ever. You'll notice the difference the moment you pick one up.</p>
+            </div>
+            <div class="gsap-scale-up flex-1 flex justify-center relative">
+                <!-- Abstract Titanium representation -->
+                <div class="w-72 h-72 md:w-96 md:h-96 rounded-full bg-gradient-titanium opacity-40 blur-[80px] absolute mix-blend-screen animate-pulse"></div>
+                <div class="w-64 h-64 md:w-80 md:h-80 border border-gray-500/30 rounded-full flex items-center justify-center backdrop-blur-3xl z-10 bg-gradient-to-br from-white/10 to-transparent">
+                    <div class="w-48 h-48 border border-gray-400/20 rounded-full flex items-center justify-center">
+                         <div class="w-32 h-32 border border-gray-300/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFading, setIsFading] = useState(false);
+    <!-- Cameras Section -->
+    <section id="cameras" class="relative bg-black py-32 border-t border-white/10 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="gsap-reveal text-5xl md:text-6xl font-bold tracking-tighter mb-6 text-white">A lens for every moment.</h2>
+            <p class="gsap-reveal text-xl text-gray-400 max-w-3xl mx-auto mb-20">Capture breathtaking details with the advanced 48MP Main camera. Get closer than ever with the 5x Telephoto lens. See the bigger picture with the Ultra Wide.</p>
+            
+            <div class="flex flex-col md:flex-row justify-center items-end gap-12 md:gap-24 mb-12">
+                <!-- Main Lens -->
+                <div class="gsap-lens flex flex-col items-center group">
+                    <div class="w-32 h-32 rounded-full border-[6px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-20 h-20 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_20px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-2 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">48MP Main</span>
+                    <span class="text-gray-500 text-sm">24mm, ƒ/1.78 aperture</span>
+                </div>
+                <!-- Ultra Wide Lens -->
+                <div class="gsap-lens flex flex-col items-center group">
+                    <div class="w-24 h-24 rounded-full border-[5px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-14 h-14 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_15px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-1 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">12MP Ultra Wide</span>
+                    <span class="text-gray-500 text-sm">13mm, 120° field of view</span>
+                </div>
+                <!-- Telephoto Lens -->
+                <div class="gsap-lens flex flex-col items-center group">
+                    <div class="w-24 h-24 rounded-full border-[5px] border-zinc-800 flex items-center justify-center bg-black mb-6 relative overflow-hidden group-hover:border-zinc-700 transition-colors">
+                         <div class="w-14 h-14 rounded-full bg-zinc-900 border-2 border-white/5 shadow-[inset_0_0_15px_rgba(0,0,0,1)]"></div>
+                         <div class="absolute inset-0 bg-gradient-screen-3 opacity-10"></div>
+                    </div>
+                    <span class="text-white text-xl font-semibold mb-2">12MP 5x Telephoto</span>
+                    <span class="text-gray-500 text-sm">120mm, ƒ/2.8 aperture</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  useEffect(() => {
-    // Lock scrolling initially
-    document.body.classList.add('loading-locked');
+    <!-- Specs Section -->
+    <section id="specs" class="relative bg-zinc-950 py-32 border-t border-white/10 z-40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="gsap-reveal text-4xl md:text-5xl font-bold tracking-tight mb-16 text-center text-white">Technical Specifications</h2>
+            
+            <div class="bg-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+                <div class="gsap-spec-row flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Display</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">6.7" Super Retina XDR OLED</strong>
+                        ProMotion technology with adaptive refresh rates up to 120Hz. HDR display, True Tone, Wide color (P3).
+                    </div>
+                </div>
+                <div class="gsap-spec-row flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Processor</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">A18 Pro Bionic chip</strong>
+                        New 6‑core CPU with 2 performance and 4 efficiency cores. New 6‑core GPU. New 16‑core Neural Engine.
+                    </div>
+                </div>
+                <div class="gsap-spec-row flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Camera</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Pro camera system</strong>
+                        48MP Main, 12MP Ultra Wide, and 12MP 5x Telephoto. Next-generation portraits with Focus and Depth Control.
+                    </div>
+                </div>
+                <div class="gsap-spec-row flex flex-col md:flex-row border-b border-white/10 hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Battery</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Up to 29 hours video playback</strong>
+                        Built-in rechargeable lithium-ion battery. MagSafe and Qi2 wireless charging. Fast-charge capable.
+                    </div>
+                </div>
+                <div class="gsap-spec-row flex flex-col md:flex-row hover:bg-white/[0.02] transition-colors p-8">
+                    <div class="md:w-1/3 font-semibold text-white text-lg mb-2 md:mb-0">Materials</div>
+                    <div class="md:w-2/3 text-gray-400">
+                        <strong class="text-gray-200 block mb-1">Aerospace-grade Titanium</strong>
+                        Textured matte glass back. Ceramic Shield front, tougher than any smartphone glass. IP68 water resistance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    const fadeTimer = setTimeout(() => {
-      setIsFading(true);
-    }, 2200);
+    <!-- Outro / Buy Section -->
+    <section id="buy" class="relative bg-black py-32 border-t border-white/10 z-50">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="gsap-reveal text-4xl md:text-6xl font-bold tracking-tight mb-8">Take a closer look.</h2>
+            <div class="gsap-reveal flex flex-col md:flex-row items-center justify-center gap-6">
+                <button class="px-8 py-4 bg-white text-black rounded-full font-semibold text-lg hover:scale-105 transition-transform">
+                    Buy Aura Pro
+                </button>
+                <button class="px-8 py-4 bg-transparent border border-gray-600 text-white rounded-full font-semibold text-lg hover:border-white transition-colors hover:scale-105 transition-transform">
+                    Compare Models
+                </button>
+            </div>
+            <p class="gsap-reveal mt-12 text-sm text-gray-500">
+                Pricing starts at $999. Trade-in values apply. <br>
+                Available in Space Black, Silver, Titanium, and Deep Purple.
+            </p>
+        </div>
+    </section>
 
-    const removeTimer = setTimeout(() => {
-      setIsLoading(false);
-      document.body.classList.remove('loading-locked');
-    }, 3000);
+    <!-- Footer -->
+    <footer class="bg-black py-12 border-t border-white/10 text-gray-500 text-xs z-50 relative">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>Copyright © 2026 Concept Corp. All rights reserved.</p>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-white transition-colors py-1">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors py-1">Terms of Use</a>
+                <a href="#" class="hover:text-white transition-colors py-1">Legal</a>
+                <a href="#" class="hover:text-white transition-colors py-1">Site Map</a>
+            </div>
+        </div>
+    </footer>
 
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-      document.body.classList.remove('loading-locked');
-    };
-  }, []);
+    <script>
+        // Ensure DOM is loaded
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
 
-  return (
-    <>
-      <CustomStyles />
-      
-      {isLoading && <BrutalistLoader isFading={isFading} />}
+            // --- CUSTOM CURSOR LOGIC ---
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorOutline = document.getElementById('cursor-outline');
+            let cursorInitialized = false;
+            
+            // GSAP quickTo is optimized for mouse tracking (use x/y instead of left/top for performance)
+            let xToDot = gsap.quickTo(cursorDot, "x", {duration: 0.05, ease: "power3"});
+            let yToDot = gsap.quickTo(cursorDot, "y", {duration: 0.05, ease: "power3"});
+            
+            let xToOutline = gsap.quickTo(cursorOutline, "x", {duration: 0.3, ease: "power3"});
+            let yToOutline = gsap.quickTo(cursorOutline, "y", {duration: 0.3, ease: "power3"});
 
-      <Header />
-      <main>
-        <HeroSection />
-        <ScrollytellingProtocol />
-        <ManifestoSection />
-        <MenuSection />
-        <MerchSection />
-      </main>
-      <Footer />
-    </>
-  );
-}
+            window.addEventListener("mousemove", (e) => {
+                // Initialize custom cursor on first mouse movement
+                if (!cursorInitialized) {
+                    document.body.classList.add('cursor-none-global');
+                    gsap.to([cursorDot, cursorOutline], {opacity: 1, duration: 0.3});
+                    cursorInitialized = true;
+                }
+                xToDot(e.clientX);
+                yToDot(e.clientY);
+                xToOutline(e.clientX);
+                yToOutline(e.clientY);
+            });
+
+            // Add hover states to interactive elements
+            const interactables = document.querySelectorAll('a, button');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorOutline.classList.add('scale-[1.5]', 'bg-white/10');
+                    cursorDot.style.opacity = '0';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorOutline.classList.remove('scale-[1.5]', 'bg-white/10');
+                    cursorDot.style.opacity = '1';
+                });
+            });
+
+            // --- HERO MAIN ANIMATION SEQUENCE ---
+            // Create a main timeline tied to the scroll container
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#scroll-container",
+                    start: "top top",      
+                    end: "bottom bottom",  
+                    scrub: 1,              
+                    pin: false,            
+                }
+            });
+
+            // 1. Initial State -> Hero text fades, Phone moves up and scales to normal size
+            tl.to("#text-phase-1", { opacity: 0, y: -50, duration: 2, ease: "power2.inOut" })
+              .to("#phone-wrapper", { y: 0, scale: 1, duration: 4, ease: "power2.out" }, "<")
+              .to("#glow", { opacity: 1, duration: 2 }, "<");
+
+            // 2. Display Phase -> Text 2 fades in, phone screen changes
+            tl.to("#text-phase-2", { opacity: 1, y: 0, duration: 2 })
+              .to("#screen-wp-2", { opacity: 1, duration: 2 }, "<") // Crossfade wallpaper
+              .to("#text-phase-2", { opacity: 0, y: -30, duration: 2, delay: 2 }); // Wait, then fade out
+
+            // 3. Performance Phase -> Phone rotates to landscape, moves right, Text 3 (left) fades in
+            tl.to("#phone-wrapper", { 
+                  rotationZ: -90, 
+                  x: "25vw", // Move to the right 
+                  scale: 0.9, 
+                  duration: 4, 
+                  ease: "power2.inOut" 
+              })
+              .to("#text-phase-3", { opacity: 1, x: 20, duration: 2 }, "-=2")
+              .to("#text-phase-3", { opacity: 0, x: -20, duration: 2, delay: 2 }); // Fade out
+
+            // 4. Camera Phase -> Phone screen goes to "camera mode", moves left, Text 4 (right) fades in
+            tl.to("#phone-wrapper", { 
+                  x: "-25vw", // Move to the left
+                  duration: 4, 
+                  ease: "power2.inOut" 
+              })
+              .to("#screen-wp-3", { opacity: 1, duration: 1 }, "-=3") // Switch screen to camera UI
+              .to("#text-phase-4", { opacity: 1, x: -20, duration: 2 }, "-=2")
+              .to("#text-phase-4", { opacity: 0, x: 20, duration: 2, delay: 2 }); // Fade out
+
+            // 5. Final Phase -> Phone returns to center, scales up massively to cover screen
+            tl.to("#phone-wrapper", {
+                rotationZ: 0,
+                x: "0",
+                y: "20vh",
+                scale: 3.5, // Zoom deep into the screen
+                opacity: 0, // Fade out as we scroll into the footer
+                duration: 5,
+                ease: "power2.in"
+            })
+            .to("#glow", { opacity: 0, duration: 2 }, "-=3");
+            
+            // --- ADDITIONAL SECTION REVEAL ANIMATIONS ---
+
+            // Generic text reveals
+            gsap.utils.toArray('.gsap-reveal').forEach(element => {
+                gsap.from(element, {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 30,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out"
+                });
+            });
+
+            // Overview Cards Stagger
+            gsap.from(".gsap-stagger-card", {
+                scrollTrigger: {
+                    trigger: "#overview",
+                    start: "top 70%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power2.out"
+            });
+
+            // Design Section Animations
+            gsap.from(".gsap-slide-right", {
+                scrollTrigger: {
+                    trigger: "#design",
+                    start: "top 60%",
+                },
+                x: -50,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power3.out"
+            });
+            gsap.from(".gsap-scale-up", {
+                scrollTrigger: {
+                    trigger: "#design",
+                    start: "top 60%",
+                },
+                scale: 0.8,
+                opacity: 0,
+                duration: 1.5,
+                ease: "elastic.out(1, 0.7)"
+            });
+
+            // Camera Lenses Stagger
+            gsap.from(".gsap-lens", {
+                scrollTrigger: {
+                    trigger: "#cameras",
+                    start: "top 70%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: "back.out(1.5)"
+            });
+
+            // Specs Row Stagger
+            gsap.from(".gsap-spec-row", {
+                scrollTrigger: {
+                    trigger: "#specs .bg-black",
+                    start: "top 75%",
+                },
+                x: -30,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+
+            // Refresh ScrollTrigger on resize
+            window.addEventListener('resize', () => {
+                ScrollTrigger.refresh();
+            });
+        });
+    </script>
+</body>
+</html>
