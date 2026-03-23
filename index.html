@@ -288,22 +288,43 @@
           </div>
         );
 
-        const Header = () => (
+        const Header = ({ navigateTo, currentPage }) => (
           <header className="fixed top-0 left-0 right-0 z-50 bg-[#09090b] border-b-4 border-[#fafafa]">
             <div className="w-full flex justify-between items-stretch">
-              <div className="flex items-center gap-3 px-6 py-4 border-r-4 border-[#fafafa] bg-[#ccff00] text-black">
+              <div 
+                onClick={() => navigateTo('home')} 
+                className="flex items-center gap-3 px-6 py-4 border-r-4 border-[#fafafa] bg-[#ccff00] text-black cursor-pointer hover:bg-white transition-colors"
+              >
                 <Zap size={24} className="animate-pulse" fill="currentColor" />
                 <span className="font-malayalam text-2xl font-black tracking-widest leading-none mt-1">കാപ്പി</span>
               </div>
               
               <nav className="flex items-stretch text-sm md:text-base font-bold uppercase tracking-widest">
-                <a href="#process" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#ff00ff] hover:text-black transition-colors">Protocol</a>
-                <a href="#manifesto" className="hidden md:flex items-center px-6 border-l-4 border-[#fafafa] hover:bg-[#7000ff] hover:text-white transition-colors">Manifesto</a>
-                <a href="#menu" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] hover:bg-[#ccff00] hover:text-black transition-colors">Menu</a>
-                <a href="#merch" className="flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] bg-[#fafafa] text-black hover:bg-[#ccff00] transition-colors gap-2">
+                <button 
+                  onClick={() => navigateTo('protocol')} 
+                  className={`hidden md:flex items-center px-6 border-l-4 border-[#fafafa] transition-colors ${currentPage === 'protocol' ? 'bg-[#ff00ff] text-black' : 'hover:bg-[#ff00ff] hover:text-black'}`}
+                >
+                  Protocol
+                </button>
+                <button 
+                  onClick={() => navigateTo('manifesto')} 
+                  className={`hidden md:flex items-center px-6 border-l-4 border-[#fafafa] transition-colors ${currentPage === 'manifesto' ? 'bg-[#7000ff] text-white' : 'hover:bg-[#7000ff] hover:text-white'}`}
+                >
+                  Manifesto
+                </button>
+                <button 
+                  onClick={() => navigateTo('menu')} 
+                  className={`flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] transition-colors ${currentPage === 'menu' ? 'bg-[#ccff00] text-black' : 'hover:bg-[#ccff00] hover:text-black'}`}
+                >
+                  Menu
+                </button>
+                <button 
+                  onClick={() => navigateTo('merch')} 
+                  className={`flex items-center px-4 md:px-6 border-l-4 border-[#fafafa] transition-colors gap-2 ${currentPage === 'merch' ? 'bg-[#ccff00] text-black' : 'bg-[#fafafa] text-black hover:bg-[#ccff00]'}`}
+                >
                   <span>Merch</span>
                   <ShoppingBag size={18} />
-                </a>
+                </button>
               </nav>
             </div>
           </header>
@@ -377,7 +398,7 @@
           const textOpacity = 1 - (subProgress * 0.4);
 
           return (
-            <section id="process" ref={sectionRef} className="h-[300vh] relative border-y-4 border-white">
+            <section ref={sectionRef} className="h-[300vh] relative border-b-4 border-white pt-20">
               <div className={`sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden transition-colors duration-700 brutal-grid ${bg}`}>
                 <div 
                   className="absolute opacity-30 text-current"
@@ -419,7 +440,7 @@
           useEffect(() => observe(refs), [refs, observe]);
 
           return (
-            <section id="manifesto" className="py-24 md:py-40 bg-[#fafafa] text-black relative">
+            <section className="min-h-screen pt-40 pb-24 md:pb-40 bg-[#fafafa] text-black relative">
               <div className="max-w-6xl mx-auto px-6">
                 <div className="grid md:grid-cols-12 gap-8 items-start">
                   <div className="md:col-span-4 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
@@ -466,7 +487,7 @@
           ];
 
           return (
-            <section id="menu" className="py-24 md:py-40 bg-[#09090b] relative border-y-4 border-white overflow-hidden brutal-grid">
+            <section className="min-h-screen pt-40 pb-24 md:pb-40 bg-[#09090b] relative border-b-4 border-white overflow-hidden brutal-grid">
               <div className="max-w-5xl mx-auto px-4 relative z-10">
                 <div className="mb-16 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
                   <h2 className="text-[#ccff00] text-6xl md:text-8xl font-black uppercase tracking-tighter mb-4 inline-block bg-black px-4 py-2 border-4 border-[#ccff00] brutal-shadow transform -rotate-2">
@@ -517,7 +538,7 @@
           ];
 
           return (
-            <section id="merch" className="py-24 md:py-40 bg-[#7000ff] border-b-4 border-white">
+            <section className="min-h-screen pt-40 pb-24 md:pb-40 bg-[#7000ff] border-b-4 border-white">
               <div className="max-w-7xl mx-auto px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-up" ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}>
                   <h2 className="text-[#fafafa] text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none text-shadow-solid" style={{ textShadow: '4px 4px 0px black' }}>
@@ -555,7 +576,7 @@
         };
 
         const Footer = () => (
-          <footer className="bg-black pt-24 pb-8 overflow-hidden relative border-t-4 border-white">
+          <footer className="bg-black pt-24 pb-8 overflow-hidden relative">
             <div className="max-w-7xl mx-auto px-6 mb-24 relative z-10 flex flex-col md:flex-row justify-between items-end gap-12">
               <div>
                 <h2 className="font-malayalam text-[#ccff00] glitch-hover" style={{ fontSize: 'clamp(4rem, 15vw, 10rem)', lineHeight: 0.8 }}>കാപ്പി</h2>
@@ -579,6 +600,7 @@
         function App() {
           const [isLoading, setIsLoading] = useState(true);
           const [isFading, setIsFading] = useState(false);
+          const [currentPage, setCurrentPage] = useState('home');
 
           useEffect(() => {
             document.body.classList.add('loading-locked');
@@ -599,18 +621,25 @@
             };
           }, []);
 
+          const navigateTo = (page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          };
+
           return (
             <>
               <CustomStyles />
               {isLoading && <BrutalistLoader isFading={isFading} />}
-              <Header />
+              <Header navigateTo={navigateTo} currentPage={currentPage} />
+              
               <main>
-                <HeroSection />
-                <ScrollytellingProtocol />
-                <ManifestoSection />
-                <MenuSection />
-                <MerchSection />
+                {currentPage === 'home' && <HeroSection />}
+                {currentPage === 'protocol' && <ScrollytellingProtocol />}
+                {currentPage === 'manifesto' && <ManifestoSection />}
+                {currentPage === 'menu' && <MenuSection />}
+                {currentPage === 'merch' && <MerchSection />}
               </main>
+              
               <Footer />
             </>
           );
