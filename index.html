@@ -221,6 +221,11 @@
         );
 
         const HeroSection = () => {
+          const [refs, setRefs] = useState([]);
+          const observe = useIntersectionObserver({ threshold: 0.1 });
+
+          useEffect(() => observe(refs), [refs, observe]);
+
           return (
             <section id="home" className="relative min-h-[70vh] md:min-h-screen flex flex-col justify-between border-b-[3px] border-black overflow-hidden bg-[#FF1E00]">
               
@@ -230,12 +235,19 @@
 
               <div className="p-6 md:p-16 flex-1 flex flex-col justify-end z-10">
                 <div className="max-w-5xl animate-float">
-                  <h2 className="font-serif-elegant text-6xl md:text-[10rem] font-black leading-[0.85] text-black mb-8 fade-in-up uppercase tracking-tighter">
+                  <h2 
+                    className="font-serif-elegant text-6xl md:text-[10rem] font-black leading-[0.85] text-black mb-8 fade-in-up uppercase tracking-tighter"
+                    ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
+                  >
                     Viscous.<br/>
                     <span className="italic text-transparent" style={{ WebkitTextStroke: '2px black' }}>Sensory.</span><br/>
                     <span className="hover-jitter inline-block">Coffee.</span>
                   </h2>
-                  <p className="text-sm md:text-base uppercase tracking-widest text-black max-w-xl leading-relaxed fade-in-up font-bold border-l-4 border-black pl-4" style={{transitionDelay: '0.2s'}}>
+                  <p 
+                    className="text-sm md:text-base uppercase tracking-widest text-black max-w-xl leading-relaxed fade-in-up font-bold border-l-4 border-black pl-4" 
+                    style={{transitionDelay: '0.2s'}}
+                    ref={el => el && !refs.includes(el) && setRefs(prev => [...prev, el])}
+                  >
                     We treat coffee as a medium. No syrups. No distractions. Just meticulously extracted single origins that command your attention.
                   </p>
                 </div>
